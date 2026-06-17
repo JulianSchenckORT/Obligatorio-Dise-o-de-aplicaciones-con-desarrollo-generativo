@@ -21,7 +21,7 @@ public class SistemaUsuarios {
         this.sesiones = new ArrayList<>();
         precargarUsuarios();
     }
-
+// las precargas van en obligatoriodisenoApplication
     private void precargarUsuarios() {
         usuarios.add(new Admin("a1", "a1", "Usuario Administrador"));
         usuarios.add(new Admin("a2", "a2", "Segundo Administrador"));

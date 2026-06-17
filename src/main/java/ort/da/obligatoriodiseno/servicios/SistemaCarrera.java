@@ -64,7 +64,7 @@ public class SistemaCarrera {
         Jornada jornada = obtenerJornada(fecha);
         return jornada == null ? null : jornada.getCarrera(id);
     }
-
+    // hay que conectarlo con la fachada y con sistema caballos para poder seleccionar un caballo
     public void agregarParticipante(Caballo caballo, Carrera carrera) {
         carrera.agregarParticipante(caballo, carrera.getCaballos().size() + 1);
     }
@@ -149,7 +149,7 @@ public class SistemaCarrera {
         notificarTablerosActualizados();
         return crearCarreraDto(carrera);
     }
-
+    // a sistema usuario
     public TableroJugadorDto obtenerTableroJugador(Jugador jugador) {
         TableroJugadorDto tablero = new TableroJugadorDto();
         tablero.setNombreJugador(jugador.getNombre());
@@ -166,7 +166,7 @@ public class SistemaCarrera {
         }
         return tablero;
     }
-
+    // cosas de apuesta a sistema usuarios o podemos hacer un sistemaApuestas
     public Apuesta prepararApuesta(Jugador jugador, int nroCarrera, int nroCaballo, double monto, String tipoApuesta)
             throws ApuestaException {
 
@@ -178,7 +178,7 @@ public class SistemaCarrera {
         RegistroParticipacion caballo = buscarCaballo(carrera, nroCaballo);
         return jugador.apostar(monto, caballo, crearFormaDeApostar(tipoApuesta));
     }
-
+// cosas de apuesta a sistema usuarios o podemos hacer un sistemaApuestas
     public ApuestaEnCursoDto obtenerApuestaEnCurso(Apuesta apuesta) {
         RegistroParticipacion caballo = apuesta.getNroRegistroCaballo();
         Carrera carrera = buscarCarreraPorRegistro(caballo);
@@ -190,7 +190,7 @@ public class SistemaCarrera {
                 dividendo, apuesta.getMonto(), apuesta.getFormaDeApostar().calcularCosto(apuesta.getMonto()),
                 montoPotencial);
     }
-
+// cosas de apuesta a sistema usuarios o podemos hacer un sistemaApuestas
     public void confirmarApuesta(Jugador jugador, Apuesta apuesta, String contrasenia) throws ApuestaException {
         if (contrasenia == null || contrasenia.isBlank()) {
             throw new ApuestaException("Debe ingresar la contrasena para confirmar la apuesta");
@@ -206,7 +206,7 @@ public class SistemaCarrera {
         }
         notificarTablerosActualizados();
     }
-
+// cosas de apuesta a sistema usuarios o podemos hacer un sistemaApuestas
     public void descartarApuesta(Jugador jugador, Apuesta apuesta) {
         try {
             jugador.descartarApuesta(apuesta);
@@ -219,7 +219,7 @@ public class SistemaCarrera {
     private void notificarTablerosActualizados() {
         PublicadorEventos.getInstancia().notificar(new EventoSistema("TABLEROS_ACTUALIZADOS", null));
     }
-
+    // precargas a ObligatoriodisenoApplication
     private void precargarJornadas() {
         LocalDate hoy = LocalDate.now();
         Jornada actual = new Jornada(hoy, hipodromo);
@@ -240,7 +240,7 @@ public class SistemaCarrera {
         jornadas.add(anterior);
         jornadas.add(futura);
     }
-
+     // precargas a ObligatoriodisenoApplication
     private Carrera crearCarreraDefinida(int numero, String nombre, Jornada jornada) {
         Carrera carrera = new Carrera(numero, nombre, jornada);
         carrera.agregarParticipante(new Caballo("Relampago Celeste"), 1);
@@ -249,7 +249,7 @@ public class SistemaCarrera {
         carrera.agregarParticipante(new Caballo("El Paisano"), 4);
         return carrera;
     }
-
+ // precargas a ObligatoriodisenoApplication
     private Carrera crearCarreraEstable(int numero, String nombre, Jornada jornada) {
         Carrera carrera = crearCarreraDefinida(numero, nombre, jornada);
         carrera.cambiarEstado(new Abierta());
@@ -257,7 +257,7 @@ public class SistemaCarrera {
         carrera.cambiarEstado(new Estable());
         return carrera;
     }
-
+ // precargas a ObligatoriodisenoApplication
     private Carrera crearCarreraCerrada(int numero, String nombre, Jornada jornada) {
         Carrera carrera = crearCarreraDefinida(numero, nombre, jornada);
         carrera.cambiarEstado(new Abierta());
@@ -265,7 +265,7 @@ public class SistemaCarrera {
         carrera.cambiarEstado(new Cerrada());
         return carrera;
     }
-
+    // precargas al ObligatoriodisenioApp.java
     private void precargarApuestas(Carrera carrera, int cantidadPorCaballo) {
         int indice = 1;
         for (RegistroParticipacion caballo : carrera.getCaballos()) {
@@ -331,7 +331,7 @@ public class SistemaCarrera {
         }
         return caballos;
     }
-
+// cosas de apuesta a sistema usuarios o podemos hacer un sistemaApuestas
     private ApuestaJugadorDto crearApuestaJugadorDto(Apuesta apuesta) {
         RegistroParticipacion caballo = apuesta.getNroRegistroCaballo();
         Carrera carrera = buscarCarreraPorRegistro(caballo);
@@ -344,7 +344,7 @@ public class SistemaCarrera {
                 obtenerNombreForma(apuesta.getFormaDeApostar()), dividendoFinal, montoCobrado,
                 finalizada ? "FINALIZADA" : "EN CURSO");
     }
-
+    // entiendo que esto y el panel de admin seria mejor manejarlo desde sistema hipodromo
     private List<Jornada> jornadasOrdenadas() {
         List<Jornada> ordenadas = new ArrayList<>(jornadas);
         ordenadas.sort(Comparator.comparing(Jornada::getFecha));
@@ -381,7 +381,7 @@ public class SistemaCarrera {
         }
         throw new ApuestaException("La carrera seleccionada no esta disponible para apostar");
     }
-
+    // por que queremos buscar una carrera por su caballo??
     private Carrera buscarCarreraPorRegistro(RegistroParticipacion registro) {
         for (Jornada jornada : jornadas) {
             for (Carrera carrera : jornada.GetCarreras()) {
@@ -392,7 +392,7 @@ public class SistemaCarrera {
         }
         throw new ApuestaException("No se encontro la carrera asociada a la apuesta");
     }
-
+    /// a utils
     private String obtenerIniciales(String nombre) {
         if (nombre == null || nombre.isBlank()) {
             return "--";
@@ -402,7 +402,7 @@ public class SistemaCarrera {
         String segunda = partes.length > 1 ? partes[1].substring(0, 1) : "";
         return (primera + segunda).toUpperCase();
     }
-
+    //// cosas de apuesta a sistema usuarios o podemos hacer un sistemaApuestas
     private String obtenerNombreForma(ort.da.obligatoriodiseno.Dominio.FormaDeApostar forma) {
         if (forma instanceof Simple) {
             return "Simple";
@@ -415,7 +415,7 @@ public class SistemaCarrera {
         }
         return forma.getClass().getSimpleName();
     }
-
+// cosas de apuesta a sistema usuarios o podemos hacer un sistemaApuestas
     private ort.da.obligatoriodiseno.Dominio.FormaDeApostar crearFormaDeApostar(String tipoApuesta) {
         if (tipoApuesta == null || tipoApuesta.isBlank()) {
             throw new ApuestaException("Debe seleccionar un tipo de apuesta");
@@ -431,7 +431,7 @@ public class SistemaCarrera {
         }
         throw new ApuestaException("Tipo de apuesta invalido");
     }
-
+    // esto tendria que ir en sistema hipodromo
     private Jornada obtenerJornadaActual() throws ApuestaException {
         Jornada actual = null;
         LocalDate hoy = LocalDate.now();
@@ -446,7 +446,7 @@ public class SistemaCarrera {
         }
         return actual;
     }
-
+    //parece mejor en sistema hipodromo
     private Jornada obtenerJornada(LocalDate fecha) {
         for (Jornada jornada : jornadas) {
             if (jornada.getFecha().equals(fecha)) {
@@ -472,7 +472,7 @@ public class SistemaCarrera {
         }
         throw new ApuestaException("No existe el caballo seleccionado para esa carrera");
     }
-
+    // a utils
     private LocalDate toLocalDate(Date fecha) {
         return fecha.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
