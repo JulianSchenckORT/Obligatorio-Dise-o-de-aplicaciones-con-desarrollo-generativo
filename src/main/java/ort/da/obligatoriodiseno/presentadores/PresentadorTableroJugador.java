@@ -1,5 +1,5 @@
 package ort.da.obligatoriodiseno.presentadores;
-import ort.da.obligatoriodiseno.Dominio.formadeapostar;
+import ort.da.obligatoriodiseno.Dominio.formaDeApostar;
 	public class PresentadorTableroJugador {
 
 	public void cargarPagina(int usuario) {
@@ -10,7 +10,7 @@ import ort.da.obligatoriodiseno.Dominio.formadeapostar;
 
 	}
 
-	public void GenerarApuesta(formadeapostar modo) {
+	public void GenerarApuesta(FormaDeApostar modo) {
 
 	}
 

@@ -9,8 +9,8 @@ public class Jugador extends Usuario {
 
 	private double Ganancias;
 
-	public void apostar(double monto, RegistroParticipacion NroRegistroCaballo, String tipoApuesta) {
-
+	public Apuesta apostar(double monto, RegistroParticipacion NroRegistroCaballo, String tipoApuesta) {
+		return null;
 	}
 
 	public void confirmarApuesta(int apuesta) {
