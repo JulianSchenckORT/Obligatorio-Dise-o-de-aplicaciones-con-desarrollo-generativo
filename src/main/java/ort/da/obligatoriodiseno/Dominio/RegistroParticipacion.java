@@ -12,14 +12,28 @@ public class RegistroParticipacion {
 
 	private List<Apuesta> listaApuestas;
 
-	private int carrera;
+	private Carrera carrera;
 
-	public Double calcularDividendo() {
-		return null;
+	private Caballo caballo;
+
+	public void calcularDividendo() {
+		this.dividendo = carrera.calcularDividendo();
 	}
+	public double getTotalApostado() {
+    double total = 0;
 
+    for (Apuesta apuesta : this.listaApuestas) {
+        total += apuesta.calcularCosto();
+    }
+
+    return total;
+	}
 	public double calcularPago() {
 		return 0;
 	}
+	public void agregarApuesta(Apuesta apuesta) {
+    this.listaApuestas.add(apuesta);
+    this.carrera.recalcularDividendos();
+}
 
 }

@@ -11,8 +11,7 @@ public class EnCurso implements EstadoApuesta {
 
 	public void confirmar(Apuesta apuesta) {
 		apuesta.cambiarEstado(new Confirmada());
-		apuesta.getNroRegistroCaballo().getListaApuestas().add(apuesta);
-		apuesta.getNroRegistroCaballo().calcularDividendo();
+		apuesta.getNroRegistroCaballo().agregarApuesta(apuesta);
 	}
 
 	

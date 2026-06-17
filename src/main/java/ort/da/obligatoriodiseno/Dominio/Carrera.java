@@ -6,13 +6,12 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import ort.da.obligatoriodiseno.Dominio.estadosCarrera.Definida;
+
 @Getter
-    @Setter
+@Setter
 public class Carrera {
 
-    
     private Jornada jornada;
-    
     private int numero;
     private String nombre;
     private List<RegistroParticipacion> caballos;
@@ -42,12 +41,24 @@ public class Carrera {
         return 0;
     }
 
-    public void totalApostadoporCaballo(RegistroParticipacion caballo) {
-
+    public double getTotalApostado() {
+        double total = 0;
+        for (RegistroParticipacion registro : this.caballos) {
+            total += registro.getTotalApostado();
+        }
+        return total;
     }
 
-    public double calcularDividendo() {
-        return 0;
+
+    public double calcularDividendo(double comision, RegistroParticipacion caballo) {
+        double totalCarrera = getTotalApostado();
+        double totalRegistro = caballo.getTotalApostado();
+        totalCarrera = totalCarrera * comision;
+
+        if (totalRegistro == 0) {
+            return 0;
+        }
+        return (totalCarrera - comision) / totalRegistro;
     }
 
     public void cambiarEstado(EstadoCarrera estado) {
@@ -56,5 +67,11 @@ public class Carrera {
 
     public void setGanador(RegistroParticipacion ganador) {
         this.ganador = ganador;
+    }
+
+    public void recalcularDividendos() {
+        for (RegistroParticipacion registro : this.caballos) {
+            registro.calcularDividendo();
+        }
     }
 }

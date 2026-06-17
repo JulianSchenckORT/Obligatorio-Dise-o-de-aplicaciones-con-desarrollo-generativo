@@ -37,4 +37,7 @@ public  class Apuesta {
 	public void descartar() {
 	this.estadoApuesta.descartar(this);
 	}
+	public double calcularCosto() {
+    return this.formaDeApostar.calcularCosto(this.monto);
+	}
 }

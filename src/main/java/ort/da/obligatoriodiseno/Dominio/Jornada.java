@@ -1,4 +1,5 @@
 package ort.da.obligatoriodiseno.Dominio;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import lombok.Getter;
@@ -8,31 +9,37 @@ import lombok.Setter;
 public class Jornada {
 
 	private Date fecha;
+	private int contadorCarreras = 0;
+	private List<Carrera> listaCarreras = new ArrayList<>();
 
-	public List<Carrera> listaCarreras;
+	public Carrera agregarCarrera(String nombre) {
+        // incrementa el contador antes de asignar
+        contadorCarreras++;
+        Carrera carrera = new Carrera(contadorCarreras, nombre, this);
 
-	public Carrera agregarCarrera(String nombre, List<Caballo> caballos) {
-		return null;
-	}
+        // la lista de caballos queda vacía porque Carrera ya inicializa caballos = new ArrayList<>();
+        this.listaCarreras.add(carrera);
+        return carrera;
+    }
 
 	public Double GetTotalApostado() {
-		return null;
+		double total = 0;
+		for (Carrera carrera : this.listaCarreras) {
+			total += carrera.getTotalApostado();
+		}
+		return total;
 	}
 
 	public double GetTotalPagado() {
-		return 0;
+		double total = 0;
+		for (Carrera carrera : this.listaCarreras) {
+			total += carrera.getTotalPagado();
+		}
+		return total;
 	}
 
 	public Double CalcularBalance() {
-		return null;
-	}
-
-	public List<Carrera> GetCarreras() {
-		return null;
-	}
-
-	public Double calcularDividendo() {
-		return null;
+		return this.GetTotalApostado() - this.GetTotalPagado();
 	}
 
 	public Carrera getCarrera(int id) {
