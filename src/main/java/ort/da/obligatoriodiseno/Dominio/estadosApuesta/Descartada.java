@@ -7,18 +7,18 @@ public class Descartada implements EstadoApuesta {
     @Override
     public void confirmar(Apuesta apuesta) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'confirmar'");
+        throw new IllegalStateException("no se puede confirmar una apuesta descartada");
     }
 
     @Override
     public void descartar(Apuesta apuesta) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'descartar'");
+        
+        throw new IllegalStateException("La apuesta ya está descartada");
     }
 
     @Override
     public void Pagar(double ganancias,Jugador jugador) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'Pagar'");
+        throw new IllegalStateException("no se puede pagar una apuesta descartada");
     }
 }

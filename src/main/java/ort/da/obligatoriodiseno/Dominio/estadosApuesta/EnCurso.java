@@ -18,8 +18,7 @@ public class EnCurso implements EstadoApuesta {
 
 	@Override
 	public void Pagar(double ganancias,Jugador jugador) {
-		// TODO Auto-generated method stub
-		throw new IllegalStateException("Unimplemented method 'Pagar'");
+		throw new IllegalStateException("no se puede pagar una apuesta en curso");
 	}
 }
 

@@ -29,12 +29,20 @@ public class Jornada {
 		return carrera;
 	}
 
-	public Double GetTotalApostado() {
-		return listaCarreras.stream().mapToDouble(Carrera::getTotalApostado).sum();
+		public Double GetTotalApostado() {
+		double total = 0;
+		for (Carrera carrera : this.listaCarreras) {
+			total += carrera.getTotalApostado();
+		}
+		return total;
 	}
 
 	public double GetTotalPagado() {
-		return listaCarreras.stream().mapToDouble(Carrera::getTotalPagado).sum();
+		double total = 0;
+		for (Carrera carrera : this.listaCarreras) {
+			total += carrera.getTotalPagado();
+		}
+		return total;
 	}
 
 	public Double CalcularBalance() {
@@ -45,9 +53,6 @@ public class Jornada {
 		return listaCarreras;
 	}
 
-	public Double calcularDividendo() {
-		return null;
-	}
 
 	public Carrera getCarrera(int id) {
 		for (Carrera carrera : listaCarreras) {

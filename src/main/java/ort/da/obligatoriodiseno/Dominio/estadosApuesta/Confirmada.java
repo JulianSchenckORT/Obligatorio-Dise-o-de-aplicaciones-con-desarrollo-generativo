@@ -11,14 +11,12 @@ public class Confirmada implements EstadoApuesta {
 
     @Override
     public void descartar(Apuesta apuesta) {
-        // TODO Auto-generated method stub
         throw new IllegalStateException("La apuesta ya está confirmada, no se puede descartar");
     }
 
     @Override
     public void Pagar(double ganancias,Jugador jugador) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'Pagar'");
+        jugador.setGanancias(jugador.getGanancias() + ganancias);
     }
 
 }
