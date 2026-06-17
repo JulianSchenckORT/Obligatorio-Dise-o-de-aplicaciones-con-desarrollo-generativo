@@ -20,4 +20,10 @@ public class Estable implements EstadoCarrera {
     public void cerrar(Carrera carrera) {
         carrera.cambiarEstado(new Cerrada());
     }
+     @Override
+    public void verificarDividendos(Carrera carrera) {
+        if (!carrera.todosDividendosValidos()) {
+            carrera.cambiarEstado(new Abierta());
+        }
+    }
 }

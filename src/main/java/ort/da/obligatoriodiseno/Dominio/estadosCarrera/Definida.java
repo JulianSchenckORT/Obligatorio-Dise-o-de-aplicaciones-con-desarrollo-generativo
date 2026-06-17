@@ -20,4 +20,8 @@ public class Definida implements EstadoCarrera {
     public void cerrar(Carrera carrera) {
         throw new IllegalStateException("No es posible cerrar esta carrera");
     }
+    @Override
+    public void verificarDividendos(Carrera carrera) {
+        ;
+    }
 }

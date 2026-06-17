@@ -7,4 +7,5 @@ public interface EstadoCarrera {
     void abrir(Carrera carrera);
 
     void cerrar(Carrera carrera);
+    void verificarDividendos(Carrera carrera);
 }

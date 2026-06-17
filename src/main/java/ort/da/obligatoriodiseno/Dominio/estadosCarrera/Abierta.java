@@ -20,4 +20,10 @@ public class Abierta implements EstadoCarrera {
     public void cerrar(Carrera carrera) {
         throw new IllegalStateException("No es posible cerrar esta carrera");
     }
+     @Override
+    public void verificarDividendos(Carrera carrera) {
+        if (carrera.todosDividendosValidos()) {
+            carrera.cambiarEstado(new Estable());
+        }
+    }
 }

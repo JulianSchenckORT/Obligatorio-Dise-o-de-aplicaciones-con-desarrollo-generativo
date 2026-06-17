@@ -42,11 +42,24 @@ public class RegistroParticipacion {
 	}
 
 	public double calcularPago() {
-		return 0;
+		double totalPago = 0;
+		double total = getTotalApostado();
+		for (Apuesta apuesta : this.listaApuestas) {
+			totalPago += apuesta.calcularpago(this.dividendo, total);
+		}
+		return totalPago;
 	}
 
 	public void agregarApuesta(Apuesta apuesta) {
 		this.listaApuestas.add(apuesta);
 		this.carrera.recalcularDividendos();
 	}
+	public void pagarApuestas() {
+    double total = this.carrera.getTotalApostado();
+
+    for (Apuesta apuesta : this.listaApuestas) {
+        double ganancias = apuesta.calcularpago(this.dividendo, total);
+        apuesta.pagar(ganancias);
+    }
+}
 }

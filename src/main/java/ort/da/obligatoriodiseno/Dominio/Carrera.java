@@ -47,7 +47,7 @@ public class Carrera {
         if (!(estado instanceof Finalizada)) {
             return 0;
         }
-        return getTotalApostado();
+        return this.ganador.calcularPago();
     }
 
     public double getTotalApostado() {
@@ -57,7 +57,9 @@ public class Carrera {
         }
         return total;
     }
-
+    public void pagar (RegistroParticipacion caballo){
+        caballo.pagarApuestas();
+    }
     public double calcularDividendo(double porcentajeDisponible, RegistroParticipacion caballo) {
         double totalCarrera = getTotalApostado();
         double totalRegistro = caballo.getTotalApostado();
@@ -107,5 +109,15 @@ public class Carrera {
         for (RegistroParticipacion registro : this.caballos) {
             registro.calcularDividendo();
         }
+         this.estado.verificarDividendos(this);
     }
+    public boolean todosDividendosValidos() {
+    for (RegistroParticipacion registro : this.caballos) {
+        if (registro.getDividendo() <= 1) {
+            return false;
+        }
+    }
+
+    return true;
+}
 }

@@ -13,15 +13,20 @@ public class Cerrada implements EstadoCarrera {
         }
         carrera.setGanador(caballo);
         carrera.cambiarEstado(new Finalizada());
+        carrera.pagar(caballo);
     }
 
     @Override
     public void abrir(Carrera carrera) {
-        throw new IllegalStateException("No se puede abrir esta carrera.");
+        throw new IllegalStateException("No se puede abrir una carrera cerrada.");
     }
 
     @Override
     public void cerrar(Carrera carrera) {
-        throw new IllegalStateException("No es posible cerrar esta carrera");
+        throw new IllegalStateException("La carrera ya está cerrada.");
+    }
+    @Override
+    public void verificarDividendos(Carrera carrera) {
+        ;
     }
 }
