@@ -1,6 +1,8 @@
 package ort.da.obligatoriodiseno.presentadores;
 
 import java.io.IOException;
+import java.util.Objects;
+
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,8 +25,10 @@ public class PresentadorEventos {
             @Override
             public void alOcurrir(EventoSistema evento) {
                 try {
+                    Object respuesta = Objects.requireNonNull(
+                            Command.lista(new Command("eventoSistema", evento)));
                     emitter.send(SseEmitter.event()
-                            .data(Command.lista(new Command("eventoSistema", evento)), MediaType.APPLICATION_JSON));
+                            .data(respuesta, MediaType.APPLICATION_JSON));
                 } catch (IOException | IllegalStateException e) {
                     PublicadorEventos.getInstancia().remover(this);
                     emitter.completeWithError(e);

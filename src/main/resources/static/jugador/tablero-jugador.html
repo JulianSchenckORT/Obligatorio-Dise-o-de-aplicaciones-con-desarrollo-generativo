@@ -504,7 +504,7 @@
                     <td>${escapar(apuesta.nombreCaballo)}</td>
                     <td class="amount">${formatearMonto(apuesta.montoApostado)}</td>
                     <td>${escapar(apuesta.tipoApuesta)}</td>
-                    <td>${Number(apuesta.dividendoFinal || 0).toFixed(2)}</td>
+                    <td>${formatearDividendoFinal(apuesta)}</td>
                     <td class="paid">${formatearMonto(apuesta.montoCobrado)}</td>
                     <td><span class="status ${apuesta.estado === 'Finalizada' ? 'done' : 'pending'}">${escapar(apuesta.estado)}</span></td>
                 </tr>
@@ -579,6 +579,13 @@
         function formatearDividendo(valor) {
             const numero = Number(valor || 0);
             return numero > 1 ? numero.toFixed(2) : 'S/E';
+        }
+
+        function formatearDividendoFinal(apuesta) {
+            if (apuesta.estado !== 'Finalizada') {
+                return '-';
+            }
+            return Number(apuesta.dividendoFinal || 0).toFixed(2);
         }
 
         function escapar(valor) {

@@ -10,8 +10,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 public class GlobalExceptionHandler {
     private static final int ERROR_APLICACION = 299;
 
-    @ExceptionHandler(ApuestaException.class)
-    public ResponseEntity<String> manejarApuestaException(ApuestaException ex) {
+    @ExceptionHandler(AplicacionException.class)
+    public ResponseEntity<String> manejarAplicacionException(AplicacionException ex) {
         return respuesta(ex.getMessage());
     }
 

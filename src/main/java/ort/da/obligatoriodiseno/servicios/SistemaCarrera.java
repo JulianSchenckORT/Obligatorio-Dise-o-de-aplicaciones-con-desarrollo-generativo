@@ -13,7 +13,9 @@ import ort.da.obligatoriodiseno.Dominio.RegistroParticipacion;
 import ort.da.obligatoriodiseno.dtos.CaballoParticipanteDto;
 import ort.da.obligatoriodiseno.dtos.CarreraDto;
 import ort.da.obligatoriodiseno.eventos.PublicadorEventos;
-import ort.da.obligatoriodiseno.excepciones.ApuestaException;
+import ort.da.obligatoriodiseno.excepciones.CaballoException;
+import ort.da.obligatoriodiseno.excepciones.CarreraException;
+import ort.da.obligatoriodiseno.excepciones.HipodromoException;
 
 public class SistemaCarrera {
     private final SistemaHipodromo sistemaHipodromo;
@@ -44,74 +46,74 @@ public class SistemaCarrera {
     public Carrera agregarCarrera(LocalDate fecha, String nombre) {
         Jornada jornada = sistemaHipodromo.obtenerJornada(fecha);
         if (jornada == null) {
-            throw new ApuestaException("No existe una jornada para la fecha indicada");
+            throw new HipodromoException("No existe una jornada para la fecha indicada");
         }
         if (nombre == null || nombre.isBlank()) {
-            throw new ApuestaException("El nombre de la carrera es obligatorio");
+            throw new CarreraException("El nombre de la carrera es obligatorio");
         }
         return jornada.agregarCarrera(nombre.trim());
     }
 
     public void agregarParticipante(Caballo caballo, Carrera carrera) {
         if (carrera == null) {
-            throw new ApuestaException("Debe indicar una carrera");
+            throw new CarreraException("Debe indicar una carrera");
         }
         Caballo caballoRegistrado = sistemaCaballo.registrarCaballo(caballo);
         boolean yaParticipa = carrera.getCaballos().stream()
                 .anyMatch(registro -> registro.getCaballo() == caballoRegistrado);
         if (yaParticipa) {
-            throw new ApuestaException("El caballo ya participa en la carrera");
+            throw new CaballoException("El caballo ya participa en la carrera");
         }
         carrera.agregarParticipante(caballoRegistrado, carrera.getCaballos().size() + 1);
     }
 
-    public CarreraDto obtenerCarreraParaGestion(LocalDate fecha, int numero) throws ApuestaException {
+    public CarreraDto obtenerCarreraParaGestion(LocalDate fecha, int numero) {
         return crearCarreraDto(obtenerCarreraDominio(fecha, numero));
     }
 
-    public CarreraDto abrirCarrera(LocalDate fecha, int numero) throws ApuestaException {
+    public CarreraDto abrirCarrera(LocalDate fecha, int numero) {
         Carrera carrera = obtenerCarreraDominio(fecha, numero);
         try {
             carrera.abrir();
         } catch (IllegalStateException e) {
-            throw new ApuestaException(e.getMessage());
+            throw new CarreraException(e.getMessage());
         }
         PublicadorEventos.getInstancia().notificarTablerosActualizados();
         return crearCarreraDto(carrera);
     }
 
-    public CarreraDto cerrarCarrera(LocalDate fecha, int numero) throws ApuestaException {
+    public CarreraDto cerrarCarrera(LocalDate fecha, int numero) {
         Carrera carrera = obtenerCarreraDominio(fecha, numero);
         try {
             carrera.cerrar();
         } catch (IllegalStateException e) {
-            throw new ApuestaException(e.getMessage());
+            throw new CarreraException(e.getMessage());
         }
         PublicadorEventos.getInstancia().notificarTablerosActualizados();
         return crearCarreraDto(carrera);
     }
 
-    public CarreraDto finalizarCarrera(LocalDate fecha, int numero, Integer caballoGanador) throws ApuestaException {
+    public CarreraDto finalizarCarrera(LocalDate fecha, int numero, Integer caballoGanador) {
         if (caballoGanador == null) {
-            throw new ApuestaException("Debe indicar el caballo ganador de la carrera");
+            throw new CarreraException("Debe indicar el caballo ganador de la carrera");
         }
         Carrera carrera = obtenerCarreraDominio(fecha, numero);
         RegistroParticipacion ganador = buscarCaballo(carrera, caballoGanador);
         try {
             carrera.finalizar(ganador);
         } catch (IllegalStateException e) {
-            throw new ApuestaException(e.getMessage());
+            throw new CarreraException(e.getMessage());
         }
         PublicadorEventos.getInstancia().notificarTablerosActualizados();
         return crearCarreraDto(carrera);
     }
 
-    Carrera buscarCarreraDisponible(LocalDate fecha, int nroCarrera) throws ApuestaException {
+    Carrera buscarCarreraDisponible(LocalDate fecha, int nroCarrera) {
         Carrera carrera = getCarrera(fecha, nroCarrera);
         if (carrera != null && estaDisponibleParaApostar(carrera)) {
             return carrera;
         }
-        throw new ApuestaException("Esta carrera ya no recibe apuestas");
+        throw new CarreraException("Esta carrera ya no recibe apuestas");
     }
 
     boolean estaDisponibleParaApostar(Carrera carrera) {
@@ -119,18 +121,18 @@ public class SistemaCarrera {
                 || "ESTABLE".equals(carrera.getNombreEstado()));
     }
 
-    RegistroParticipacion buscarCaballo(Carrera carrera, int numeroCaballo) throws ApuestaException {
+    RegistroParticipacion buscarCaballo(Carrera carrera, int numeroCaballo) {
         for (RegistroParticipacion caballo : carrera.getCaballos()) {
             if (caballo.getId() == numeroCaballo) {
                 return caballo;
             }
         }
-        throw new ApuestaException("No existe el caballo seleccionado para esa carrera");
+        throw new CaballoException("No existe el caballo seleccionado para esa carrera");
     }
 
     Carrera obtenerCarreraPorRegistro(RegistroParticipacion registro) {
         if (registro == null || registro.getCarrera() == null) {
-            throw new ApuestaException("No se encontró la carrera asociada a la apuesta");
+            throw new CarreraException("No se encontró la carrera asociada a la apuesta");
         }
         return registro.getCarrera();
     }
@@ -151,10 +153,10 @@ public class SistemaCarrera {
         return caballos;
     }
 
-    private Carrera obtenerCarreraDominio(LocalDate fecha, int numero) throws ApuestaException {
+    private Carrera obtenerCarreraDominio(LocalDate fecha, int numero) {
         Carrera carrera = getCarrera(fecha, numero);
         if (carrera == null) {
-            throw new ApuestaException("No existe la carrera seleccionada");
+            throw new CarreraException("No existe la carrera seleccionada");
         }
         return carrera;
     }

@@ -23,6 +23,9 @@
             </div>
             <button type="submit" class="btn-acceder">Acceder</button>
         </form>
+        <button type="button" class="btn-secundario" onclick="borrarSesionesAdmin()">
+            Borrar sesiones activas admin
+        </button>
 
         <a class="login-link" href="/login.html">Ingresar como jugador</a>
     </div>
@@ -43,6 +46,10 @@
         function acceder(event) {
             event.preventDefault();
             CommandDispatcher.submit('/login-admin/login', serializarFormulario('formLogin'));
+        }
+
+        function borrarSesionesAdmin() {
+            CommandDispatcher.submit('/login-admin/borrar-sesiones', {});
         }
     </script>
 </body>

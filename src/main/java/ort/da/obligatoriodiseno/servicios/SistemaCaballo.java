@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ort.da.obligatoriodiseno.Dominio.Caballo;
-import ort.da.obligatoriodiseno.excepciones.ApuestaException;
+import ort.da.obligatoriodiseno.excepciones.CaballoException;
 
 public class SistemaCaballo {
     private final List<Caballo> caballos = new ArrayList<>();
@@ -16,7 +16,7 @@ public class SistemaCaballo {
 
     public Caballo registrarCaballo(Caballo caballo) {
         if (caballo == null) {
-            throw new ApuestaException("Debe indicar un caballo");
+            throw new CaballoException("Debe indicar un caballo");
         }
         validarNombre(caballo.getNombre());
         Caballo existente = buscarPorNombre(caballo.getNombre());
@@ -38,7 +38,7 @@ public class SistemaCaballo {
 
     private void validarNombre(String nombre) {
         if (nombre == null || nombre.isBlank()) {
-            throw new ApuestaException("El nombre del caballo es obligatorio");
+            throw new CaballoException("El nombre del caballo es obligatorio");
         }
     }
 }

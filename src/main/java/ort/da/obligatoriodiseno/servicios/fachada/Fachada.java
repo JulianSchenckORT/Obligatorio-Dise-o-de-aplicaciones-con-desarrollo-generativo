@@ -14,7 +14,6 @@ import ort.da.obligatoriodiseno.dtos.ApuestaEnCursoDto;
 import ort.da.obligatoriodiseno.dtos.CarreraDto;
 import ort.da.obligatoriodiseno.dtos.TableroAdministradorDto;
 import ort.da.obligatoriodiseno.dtos.TableroJugadorDto;
-import ort.da.obligatoriodiseno.excepciones.ApuestaException;
 import ort.da.obligatoriodiseno.servicios.SistemaApuestas;
 import ort.da.obligatoriodiseno.servicios.SistemaCaballo;
 import ort.da.obligatoriodiseno.servicios.SistemaCarrera;
@@ -69,11 +68,11 @@ public class Fachada {
         sistemaApuestas.registrarModalidad(modalidad);
     }
 
-    public Admin loginAdministrador(String nombreUsuario, String contrasenia) throws ApuestaException {
+    public Admin loginAdministrador(String nombreUsuario, String contrasenia) {
         return sistemaUsuarios.loginAdministrador(nombreUsuario, contrasenia);
     }
 
-    public Jugador loginJugador(String nombreUsuario, String contrasenia) throws ApuestaException {
+    public Jugador loginJugador(String nombreUsuario, String contrasenia) {
         return sistemaUsuarios.loginJugador(nombreUsuario, contrasenia);
     }
 
@@ -81,35 +80,39 @@ public class Fachada {
         sistemaUsuarios.logout(usuario);
     }
 
-    public TableroAdministradorDto obtenerTableroAdministrador() throws ApuestaException {
+    public void borrarSesionesAdministradores() {
+        sistemaUsuarios.borrarSesionesAdministradores();
+    }
+
+    public TableroAdministradorDto obtenerTableroAdministrador() {
         return sistemaHipodromo.obtenerTableroAdministrador();
     }
 
-    public TableroAdministradorDto obtenerTableroAdministrador(LocalDate fecha) throws ApuestaException {
+    public TableroAdministradorDto obtenerTableroAdministrador(LocalDate fecha) {
         return sistemaHipodromo.obtenerTableroAdministrador(fecha);
     }
 
-    public TableroAdministradorDto obtenerTableroJornadaAnterior(LocalDate fecha) throws ApuestaException {
+    public TableroAdministradorDto obtenerTableroJornadaAnterior(LocalDate fecha) {
         return sistemaHipodromo.obtenerTableroJornadaAnterior(fecha);
     }
 
-    public TableroAdministradorDto obtenerTableroJornadaSiguiente(LocalDate fecha) throws ApuestaException {
+    public TableroAdministradorDto obtenerTableroJornadaSiguiente(LocalDate fecha) {
         return sistemaHipodromo.obtenerTableroJornadaSiguiente(fecha);
     }
 
-    public CarreraDto obtenerCarreraParaGestion(LocalDate fecha, int numero) throws ApuestaException {
+    public CarreraDto obtenerCarreraParaGestion(LocalDate fecha, int numero) {
         return sistemaCarrera.obtenerCarreraParaGestion(fecha, numero);
     }
 
-    public CarreraDto abrirCarrera(LocalDate fecha, int numero) throws ApuestaException {
+    public CarreraDto abrirCarrera(LocalDate fecha, int numero) {
         return sistemaCarrera.abrirCarrera(fecha, numero);
     }
 
-    public CarreraDto cerrarCarrera(LocalDate fecha, int numero) throws ApuestaException {
+    public CarreraDto cerrarCarrera(LocalDate fecha, int numero) {
         return sistemaCarrera.cerrarCarrera(fecha, numero);
     }
 
-    public CarreraDto finalizarCarrera(LocalDate fecha, int numero, Integer caballoGanador) throws ApuestaException {
+    public CarreraDto finalizarCarrera(LocalDate fecha, int numero, Integer caballoGanador) {
         return sistemaCarrera.finalizarCarrera(fecha, numero, caballoGanador);
     }
 
@@ -118,7 +121,7 @@ public class Fachada {
     }
 
     public Apuesta prepararApuesta(Jugador jugador, LocalDate fecha, int nroCarrera, int nroCaballo,
-            double monto, String tipoApuesta) throws ApuestaException {
+            double monto, String tipoApuesta) {
         return sistemaApuestas.prepararApuesta(jugador, fecha, nroCarrera, nroCaballo, monto, tipoApuesta);
     }
 
@@ -126,7 +129,7 @@ public class Fachada {
         return sistemaApuestas.obtenerApuestaEnCurso(apuesta);
     }
 
-    public void confirmarApuesta(Jugador jugador, Apuesta apuesta, String contrasenia) throws ApuestaException {
+    public void confirmarApuesta(Jugador jugador, Apuesta apuesta, String contrasenia) {
         sistemaApuestas.confirmarApuesta(jugador, apuesta, contrasenia);
     }
 

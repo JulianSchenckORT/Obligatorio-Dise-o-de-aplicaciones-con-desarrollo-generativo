@@ -13,7 +13,7 @@ public class Abierta implements EstadoCarrera {
 
     @Override
     public void abrir(Carrera carrera) {
-        throw new IllegalStateException("No se puede abrir esta carrera.");
+        throw new IllegalStateException("La carrera ya esta abierta");
     }
 
     @Override

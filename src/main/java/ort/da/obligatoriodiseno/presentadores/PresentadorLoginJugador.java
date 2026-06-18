@@ -4,7 +4,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ort.da.obligatoriodiseno.Dominio.Jugador;
-import ort.da.obligatoriodiseno.excepciones.ApuestaException;
 
 @RestController
 @RequestMapping("/login-jugador")
@@ -16,7 +15,7 @@ public class PresentadorLoginJugador extends PresentadorLogin<Jugador> {
     }
 
     @Override
-    protected Jugador obtenerUsuario(String nombreUsuario, String contrasenia) throws ApuestaException {
+    protected Jugador obtenerUsuario(String nombreUsuario, String contrasenia) {
         return fachada.loginJugador(nombreUsuario, contrasenia);
     }
 

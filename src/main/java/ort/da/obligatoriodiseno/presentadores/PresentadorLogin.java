@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpSession;
 import ort.da.obligatoriodiseno.servicios.fachada.Fachada;
 import ort.da.obligatoriodiseno.utils.Command;
 import ort.da.obligatoriodiseno.utils.Commands;
-import ort.da.obligatoriodiseno.excepciones.ApuestaException;
+import ort.da.obligatoriodiseno.excepciones.UsuarioException;
 import ort.da.obligatoriodiseno.Dominio.Usuario;
 
 public abstract class PresentadorLogin<U extends Usuario> {
@@ -48,12 +48,12 @@ public abstract class PresentadorLogin<U extends Usuario> {
         if (tipo.isInstance(usuario)) {
             return tipo.cast(usuario);
         }
-        throw new ApuestaException(mensajeError);
+        throw new UsuarioException(mensajeError);
     }
 
     protected abstract String siguienteCU();
 
-    protected abstract U obtenerUsuario(String nombreUsuario, String contrasenia) throws ApuestaException;
+    protected abstract U obtenerUsuario(String nombreUsuario, String contrasenia);
 
     protected abstract String getLoginPage();
 

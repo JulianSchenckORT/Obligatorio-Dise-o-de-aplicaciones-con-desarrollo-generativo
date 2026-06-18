@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import ort.da.obligatoriodiseno.excepciones.ApuestaException;
+import ort.da.obligatoriodiseno.excepciones.UsuarioException;
 
 @Getter
 @Setter
@@ -36,7 +37,7 @@ public class Jugador extends Usuario {
         }
         double costo = apuesta.calcularCosto();
         if (Saldo < costo) {
-            throw new ApuestaException("Saldo insuficiente");
+            throw new UsuarioException("Saldo insuficiente");
         }
         apuesta.confirmar();
         Saldo -= costo;

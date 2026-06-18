@@ -11,7 +11,7 @@ import ort.da.obligatoriodiseno.Dominio.Jugador;
 import ort.da.obligatoriodiseno.Dominio.SesionActiva;
 import ort.da.obligatoriodiseno.Dominio.Usuario;
 import ort.da.obligatoriodiseno.dtos.TableroJugadorDto;
-import ort.da.obligatoriodiseno.excepciones.ApuestaException;
+import ort.da.obligatoriodiseno.excepciones.UsuarioException;
 import ort.da.obligatoriodiseno.utils.TextoUtils;
 
 public class SistemaUsuarios {
@@ -29,12 +29,12 @@ public class SistemaUsuarios {
 
     public void registrarUsuario(Usuario usuario) {
         if (usuario == null || usuario.getUsername() == null || usuario.getUsername().isBlank()) {
-            throw new ApuestaException("Debe indicar un usuario");
+            throw new UsuarioException("Debe indicar un usuario");
         }
         boolean existe = usuarios.stream()
                 .anyMatch(registrado -> registrado.getUsername().equalsIgnoreCase(usuario.getUsername()));
         if (existe) {
-            throw new ApuestaException("Ya existe un usuario con ese nombre");
+            throw new UsuarioException("Ya existe un usuario con ese nombre");
         }
         usuarios.add(usuario);
     }
@@ -57,34 +57,34 @@ public class SistemaUsuarios {
         return tablero;
     }
 
-    private Usuario login(String nombre, String contrasenia) throws ApuestaException {
+    private Usuario login(String nombre, String contrasenia) {
         if (nombre == null || nombre.isBlank() || contrasenia == null || contrasenia.isBlank()) {
-            throw new ApuestaException("Acceso denegado");
+            throw new UsuarioException("Acceso denegado");
         }
         for (Usuario usuario : usuarios) {
             if (usuario.esPasswordDe(nombre, contrasenia)) {
                 return usuario;
             }
         }
-        throw new ApuestaException("Acceso denegado");
+        throw new UsuarioException("Acceso denegado");
     }
 
-    public Admin loginAdministrador(String nombre, String contrasenia) throws ApuestaException {
+    public Admin loginAdministrador(String nombre, String contrasenia) {
         Usuario usuario = login(nombre, contrasenia);
         if (!(usuario instanceof Admin admin)) {
-            throw new ApuestaException("Acceso denegado");
+            throw new UsuarioException("Acceso denegado");
         }
         if (tieneSesionActiva(admin)) {
-            throw new ApuestaException("El administrador ya tiene una sesión activa");
+            throw new UsuarioException("El administrador ya tiene una sesión activa");
         }
         sesiones.add(new SesionActiva(admin));
         return admin;
     }
 
-    public Jugador loginJugador(String nombre, String contrasenia) throws ApuestaException {
+    public Jugador loginJugador(String nombre, String contrasenia) {
         Usuario usuario = login(nombre, contrasenia);
         if (!(usuario instanceof Jugador jugador)) {
-            throw new ApuestaException("Acceso denegado");
+            throw new UsuarioException("Acceso denegado");
         }
         if (!tieneSesionActiva(jugador)) {
             sesiones.add(new SesionActiva(jugador));
@@ -103,6 +103,10 @@ public class SistemaUsuarios {
 
     public void logout(Usuario usuario) {
         sesiones.removeIf(sesion -> sesion.getUsuario().equals(usuario));
+    }
+
+    public void borrarSesionesAdministradores() {
+        sesiones.removeIf(sesion -> sesion.getUsuario() instanceof Admin);
     }
 
 }

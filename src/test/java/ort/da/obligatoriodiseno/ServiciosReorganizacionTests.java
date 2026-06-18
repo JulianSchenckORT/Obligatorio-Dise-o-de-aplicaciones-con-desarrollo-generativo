@@ -21,6 +21,9 @@ import ort.da.obligatoriodiseno.Dominio.formaDeApostar.Triple;
 import ort.da.obligatoriodiseno.dtos.TableroAdministradorDto;
 import ort.da.obligatoriodiseno.dtos.TableroJugadorDto;
 import ort.da.obligatoriodiseno.excepciones.ApuestaException;
+import ort.da.obligatoriodiseno.excepciones.CaballoException;
+import ort.da.obligatoriodiseno.excepciones.CarreraException;
+import ort.da.obligatoriodiseno.excepciones.UsuarioException;
 import ort.da.obligatoriodiseno.servicios.SistemaApuestas;
 import ort.da.obligatoriodiseno.servicios.SistemaCaballo;
 import ort.da.obligatoriodiseno.servicios.SistemaCarrera;
@@ -64,7 +67,7 @@ class ServiciosReorganizacionTests {
         Apuesta apuesta = preparar(jugador, 1, 100, "Simple");
 
         assertEquals(1000, jugador.getSaldo(), DELTA);
-        ApuestaException error = assertThrows(ApuestaException.class,
+        UsuarioException error = assertThrows(UsuarioException.class,
                 () -> sistemaApuestas.confirmarApuesta(jugador, apuesta, "incorrecta"));
         assertEquals("Contraseña incorrecta", error.getMessage());
         assertEquals(1000, jugador.getSaldo(), DELTA);
@@ -85,7 +88,7 @@ class ServiciosReorganizacionTests {
         Jugador jugadorSinSaldo = new Jugador("sinSaldo", "clave", "Sin Saldo", 100);
         Apuesta apuesta = preparar(jugadorSinSaldo, 1, 100, "Súper");
 
-        ApuestaException error = assertThrows(ApuestaException.class,
+        UsuarioException error = assertThrows(UsuarioException.class,
                 () -> sistemaApuestas.confirmarApuesta(jugadorSinSaldo, apuesta, "clave"));
 
         assertEquals("Saldo insuficiente", error.getMessage());
@@ -136,7 +139,7 @@ class ServiciosReorganizacionTests {
         double dividendoAlCerrar = carrera.getCaballos().getFirst().getDividendo();
 
         carrera.cerrar();
-        ApuestaException error = assertThrows(ApuestaException.class,
+        CarreraException error = assertThrows(CarreraException.class,
                 () -> sistemaApuestas.confirmarApuesta(jugador, pendiente, "clave"));
 
         assertEquals("Esta carrera ya no recibe apuestas", error.getMessage());
@@ -214,7 +217,7 @@ class ServiciosReorganizacionTests {
 
         assertSame(carrera.getCaballos().getFirst().getCaballo(), registrado);
         assertSame(registrado, sistemaCaballo.registrarCaballo("Uno"));
-        assertThrows(ApuestaException.class,
+        assertThrows(CaballoException.class,
                 () -> sistemaCarrera.agregarParticipante(new Caballo("Uno"), carrera));
     }
 

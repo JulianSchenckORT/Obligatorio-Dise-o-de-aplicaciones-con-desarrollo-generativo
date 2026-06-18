@@ -61,7 +61,8 @@ public class ObligatoriodisenoApplication {
         fachada.registrarJornada(fechaFutura);
         fachada.registrarJornada(fechaFuturaLejana);
 
-        agregarCarreraDisponible(fachada, hoy, "Premio Apertura", caballos);
+        Carrera premioApertura = agregarCarreraDisponible(fachada, hoy, "Premio Apertura", caballos);
+        precargarApuestas(premioApertura, 1, modalidadSimple);
         agregarCarreraDisponible(fachada, hoy, "Clasico MalaPata", caballos);
         agregarCarreraDisponible(fachada, hoy, "Copa Primavera", caballos);
         agregarCarreraDisponible(fachada, hoy, "Gran Premio Montevideo", caballos);

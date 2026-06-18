@@ -15,7 +15,10 @@ import ort.da.obligatoriodiseno.Dominio.RegistroParticipacion;
 import ort.da.obligatoriodiseno.dtos.ApuestaEnCursoDto;
 import ort.da.obligatoriodiseno.dtos.ApuestaJugadorDto;
 import ort.da.obligatoriodiseno.eventos.PublicadorEventos;
+import ort.da.obligatoriodiseno.excepciones.AplicacionException;
 import ort.da.obligatoriodiseno.excepciones.ApuestaException;
+import ort.da.obligatoriodiseno.excepciones.CarreraException;
+import ort.da.obligatoriodiseno.excepciones.UsuarioException;
 
 public class SistemaApuestas {
     private final SistemaCarrera sistemaCarrera;
@@ -48,7 +51,7 @@ public class SistemaApuestas {
     }
 
     public Apuesta prepararApuesta(Jugador jugador, LocalDate fecha, int nroCarrera, int nroCaballo,
-            double monto, String tipoApuesta) throws ApuestaException {
+            double monto, String tipoApuesta) {
         validarMonto(monto);
         Carrera carrera = sistemaCarrera.buscarCarreraDisponible(fecha, nroCarrera);
         RegistroParticipacion caballo = sistemaCarrera.buscarCaballo(carrera, nroCaballo);
@@ -70,18 +73,18 @@ public class SistemaApuestas {
                 dividendo, apuesta.getMonto(), apuesta.calcularCosto(), montoPotencial);
     }
 
-    public void confirmarApuesta(Jugador jugador, Apuesta apuesta, String contrasenia) throws ApuestaException {
+    public void confirmarApuesta(Jugador jugador, Apuesta apuesta, String contrasenia) {
         validarContrasenia(jugador, contrasenia);
         validarMonto(apuesta.getMonto());
         Carrera carrera = sistemaCarrera.obtenerCarreraPorRegistro(apuesta.getNroRegistroCaballo());
 
         synchronized (carrera) {
             if (!sistemaCarrera.estaDisponibleParaApostar(carrera)) {
-                throw new ApuestaException("Esta carrera ya no recibe apuestas");
+                throw new CarreraException("Esta carrera ya no recibe apuestas");
             }
             try {
                 jugador.confirmarApuesta(apuesta);
-            } catch (ApuestaException e) {
+            } catch (AplicacionException e) {
                 throw e;
             } catch (IllegalStateException e) {
                 throw new ApuestaException(e.getMessage());
@@ -93,7 +96,7 @@ public class SistemaApuestas {
     public void descartarApuesta(Jugador jugador, Apuesta apuesta) {
         try {
             jugador.descartarApuesta(apuesta);
-        } catch (ApuestaException e) {
+        } catch (AplicacionException e) {
             throw e;
         } catch (IllegalStateException e) {
             throw new ApuestaException(e.getMessage());
@@ -150,7 +153,7 @@ public class SistemaApuestas {
 
     private void validarContrasenia(Jugador jugador, String contrasenia) {
         if (contrasenia == null || !jugador.esPasswordDe(jugador.getUsername(), contrasenia)) {
-            throw new ApuestaException("Contraseña incorrecta");
+            throw new UsuarioException("Contraseña incorrecta");
         }
     }
 
