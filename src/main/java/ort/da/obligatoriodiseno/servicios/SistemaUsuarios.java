@@ -19,15 +19,12 @@ public class SistemaUsuarios {
     private final Collection<SesionActiva> sesiones;
     private final SistemaCarrera sistemaCarrera;
     private final SistemaApuestas sistemaApuestas;
-    private final SistemaModalidadesApuesta sistemaModalidades;
 
-    public SistemaUsuarios(SistemaCarrera sistemaCarrera, SistemaApuestas sistemaApuestas,
-            SistemaModalidadesApuesta sistemaModalidades) {
+    public SistemaUsuarios(SistemaCarrera sistemaCarrera, SistemaApuestas sistemaApuestas) {
         this.usuarios = new ArrayList<>();
         this.sesiones = new ArrayList<>();
         this.sistemaCarrera = sistemaCarrera;
         this.sistemaApuestas = sistemaApuestas;
-        this.sistemaModalidades = sistemaModalidades;
     }
 
     public void registrarUsuario(Usuario usuario) {
@@ -53,7 +50,7 @@ public class SistemaUsuarios {
         tablero.setSaldoActual(jugador.getSaldo());
         tablero.setTotalApostado(jugador.calcularTotalApostado());
         tablero.setTotalGanado(jugador.getGanancias());
-        tablero.setModalidadesApuesta(sistemaModalidades.obtenerNombres());
+        tablero.setModalidadesApuesta(sistemaApuestas.obtenerNombresModalidades());
 
         for (Carrera carrera : sistemaCarrera.getCarrerasDisponibles()) {
             tablero.getCarrerasDisponibles().add(sistemaCarrera.crearCarreraDto(carrera));

@@ -22,7 +22,6 @@ import ort.da.obligatoriodiseno.servicios.SistemaApuestas;
 import ort.da.obligatoriodiseno.servicios.SistemaCaballo;
 import ort.da.obligatoriodiseno.servicios.SistemaCarrera;
 import ort.da.obligatoriodiseno.servicios.SistemaHipodromo;
-import ort.da.obligatoriodiseno.servicios.SistemaModalidadesApuesta;
 import ort.da.obligatoriodiseno.servicios.SistemaUsuarios;
 
 public class Fachada {
@@ -33,15 +32,13 @@ public class Fachada {
     private final SistemaHipodromo sistemaHipodromo;
     private final SistemaCaballo sistemaCaballo;
     private final SistemaApuestas sistemaApuestas;
-    private final SistemaModalidadesApuesta sistemaModalidades;
 
     private Fachada() {
         sistemaHipodromo = new SistemaHipodromo();
         sistemaCaballo = new SistemaCaballo();
         sistemaCarrera = new SistemaCarrera(sistemaHipodromo, sistemaCaballo);
-        sistemaModalidades = new SistemaModalidadesApuesta();
-        sistemaApuestas = new SistemaApuestas(sistemaCarrera, sistemaModalidades);
-        sistemaUsuarios = new SistemaUsuarios(sistemaCarrera, sistemaApuestas, sistemaModalidades);
+        sistemaApuestas = new SistemaApuestas(sistemaCarrera);
+        sistemaUsuarios = new SistemaUsuarios(sistemaCarrera, sistemaApuestas);
     }
 
     public static Fachada getInstancia() {
@@ -76,7 +73,7 @@ public class Fachada {
     }
 
     public void registrarModalidad(FormaDeApostar modalidad) {
-        sistemaModalidades.registrar(modalidad);
+        sistemaApuestas.registrarModalidad(modalidad);
     }
 
     public Admin loginAdministrador(String nombreUsuario, String contrasenia) throws ApuestaException {

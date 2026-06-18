@@ -25,7 +25,6 @@ import ort.da.obligatoriodiseno.servicios.SistemaApuestas;
 import ort.da.obligatoriodiseno.servicios.SistemaCaballo;
 import ort.da.obligatoriodiseno.servicios.SistemaCarrera;
 import ort.da.obligatoriodiseno.servicios.SistemaHipodromo;
-import ort.da.obligatoriodiseno.servicios.SistemaModalidadesApuesta;
 import ort.da.obligatoriodiseno.servicios.SistemaUsuarios;
 
 class ServiciosReorganizacionTests {
@@ -34,7 +33,6 @@ class ServiciosReorganizacionTests {
     private SistemaHipodromo sistemaHipodromo;
     private SistemaCaballo sistemaCaballo;
     private SistemaCarrera sistemaCarrera;
-    private SistemaModalidadesApuesta sistemaModalidades;
     private SistemaApuestas sistemaApuestas;
     private SistemaUsuarios sistemaUsuarios;
     private Carrera carrera;
@@ -45,12 +43,11 @@ class ServiciosReorganizacionTests {
         sistemaHipodromo = new SistemaHipodromo();
         sistemaCaballo = new SistemaCaballo();
         sistemaCarrera = new SistemaCarrera(sistemaHipodromo, sistemaCaballo);
-        sistemaModalidades = new SistemaModalidadesApuesta();
-        sistemaModalidades.registrar(new Simple());
-        sistemaModalidades.registrar(new Triple());
-        sistemaModalidades.registrar(new Super());
-        sistemaApuestas = new SistemaApuestas(sistemaCarrera, sistemaModalidades);
-        sistemaUsuarios = new SistemaUsuarios(sistemaCarrera, sistemaApuestas, sistemaModalidades);
+        sistemaApuestas = new SistemaApuestas(sistemaCarrera);
+        sistemaApuestas.registrarModalidad(new Simple());
+        sistemaApuestas.registrarModalidad(new Triple());
+        sistemaApuestas.registrarModalidad(new Super());
+        sistemaUsuarios = new SistemaUsuarios(sistemaCarrera, sistemaApuestas);
 
         sistemaHipodromo.registrarJornada(LocalDate.now());
         carrera = sistemaCarrera.agregarCarrera(LocalDate.now(), "Carrera de prueba");
@@ -175,6 +172,14 @@ class ServiciosReorganizacionTests {
     void modalidadesRegistradasAlimentanElTablero() {
         assertEquals(java.util.List.of("Simple", "Triple", "Súper"),
                 sistemaUsuarios.obtenerTableroJugador(jugador).getModalidadesApuesta());
+    }
+
+    @Test
+    void registrarUnaModalidadExistenteLaReemplazaSinDuplicarla() {
+        sistemaApuestas.registrarModalidad(new Simple());
+
+        assertEquals(java.util.List.of("Simple", "Triple", "Súper"),
+                sistemaApuestas.obtenerNombresModalidades());
     }
 
     @Test

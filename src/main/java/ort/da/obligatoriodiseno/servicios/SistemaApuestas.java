@@ -1,9 +1,11 @@
 package ort.da.obligatoriodiseno.servicios;
 
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import ort.da.obligatoriodiseno.Dominio.Apuesta;
 import ort.da.obligatoriodiseno.Dominio.Carrera;
@@ -18,11 +20,32 @@ import ort.da.obligatoriodiseno.excepciones.ApuestaException;
 
 public class SistemaApuestas {
     private final SistemaCarrera sistemaCarrera;
-    private final SistemaModalidadesApuesta sistemaModalidades;
+    private final List<FormaDeApostar> modalidades = new ArrayList<>();
 
-    public SistemaApuestas(SistemaCarrera sistemaCarrera, SistemaModalidadesApuesta sistemaModalidades) {
+    public SistemaApuestas(SistemaCarrera sistemaCarrera) {
         this.sistemaCarrera = sistemaCarrera;
-        this.sistemaModalidades = sistemaModalidades;
+    }
+
+    public void registrarModalidad(FormaDeApostar modalidad) {
+        if (modalidad == null || modalidad.getNombre() == null || modalidad.getNombre().isBlank()) {
+            throw new ApuestaException("La modalidad de apuesta es inválida");
+        }
+
+        for (int i = 0; i < modalidades.size(); i++) {
+            if (normalizar(modalidades.get(i).getNombre()).equals(normalizar(modalidad.getNombre()))) {
+                modalidades.set(i, modalidad);
+                return;
+            }
+        }
+        modalidades.add(modalidad);
+    }
+
+    public List<String> obtenerNombresModalidades() {
+        List<String> nombres = new ArrayList<>();
+        for (FormaDeApostar modalidad : modalidades) {
+            nombres.add(modalidad.getNombre());
+        }
+        return List.copyOf(nombres);
     }
 
     public Apuesta prepararApuesta(Jugador jugador, LocalDate fecha, int nroCarrera, int nroCaballo,
@@ -30,7 +53,7 @@ public class SistemaApuestas {
         validarMonto(monto);
         Carrera carrera = sistemaCarrera.buscarCarreraDisponible(fecha, nroCarrera);
         RegistroParticipacion caballo = sistemaCarrera.buscarCaballo(carrera, nroCaballo);
-        FormaDeApostar modalidad = sistemaModalidades.obtener(tipoApuesta);
+        FormaDeApostar modalidad = obtenerModalidad(tipoApuesta);
         return jugador.prepararApuesta(monto, caballo, modalidad);
     }
 
@@ -105,6 +128,25 @@ public class SistemaApuestas {
         if (!Double.isFinite(monto) || monto < 1) {
             throw new ApuestaException("Monto inválido");
         }
+    }
+
+    private FormaDeApostar obtenerModalidad(String nombre) {
+        String nombreNormalizado = normalizar(nombre);
+        for (FormaDeApostar modalidad : modalidades) {
+            if (normalizar(modalidad.getNombre()).equals(nombreNormalizado)) {
+                return modalidad;
+            }
+        }
+        throw new ApuestaException("Tipo de apuesta inválido");
+    }
+
+    private String normalizar(String valor) {
+        if (valor == null) {
+            return "";
+        }
+        return Normalizer.normalize(valor.trim(), Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .toLowerCase(Locale.ROOT);
     }
 
     private void validarContrasenia(Jugador jugador, String contrasenia) {
