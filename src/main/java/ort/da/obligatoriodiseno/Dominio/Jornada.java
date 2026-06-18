@@ -2,6 +2,7 @@ package ort.da.obligatoriodiseno.Dominio;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import lombok.Getter;
@@ -60,6 +61,12 @@ public class Jornada {
 
 	public List<Carrera> GetCarreras() {
 		return listaCarreras;
+	}
+
+	public List<Carrera> getCarrerasOrdenadas() {
+		List<Carrera> carrerasOrdenadas = new ArrayList<>(listaCarreras);
+		carrerasOrdenadas.sort(Comparator.comparingInt(Carrera::getNumero));
+		return carrerasOrdenadas;
 	}
 
 

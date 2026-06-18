@@ -44,10 +44,10 @@ public class GlobalExceptionHandler {
             return "contraseña";
         }
         if ("nroCarrera".equals(nombreTecnico)) {
-            return "numero de carrera";
+            return "número de carrera";
         }
         if ("nroCaballo".equals(nombreTecnico)) {
-            return "numero de caballo";
+            return "número de caballo";
         }
         if ("caballoGanador".equals(nombreTecnico)) {
             return "caballo ganador";

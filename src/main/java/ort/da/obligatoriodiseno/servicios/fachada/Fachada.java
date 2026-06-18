@@ -1,9 +1,6 @@
 package ort.da.obligatoriodiseno.servicios.fachada;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
 
 import ort.da.obligatoriodiseno.Dominio.Admin;
 import ort.da.obligatoriodiseno.Dominio.Apuesta;
@@ -68,10 +65,6 @@ public class Fachada {
         sistemaCarrera.agregarParticipante(caballo, carrera);
     }
 
-    public List<Caballo> obtenerCaballos() {
-        return sistemaCaballo.getAllCaballos();
-    }
-
     public void registrarModalidad(FormaDeApostar modalidad) {
         sistemaApuestas.registrarModalidad(modalidad);
     }
@@ -86,14 +79,6 @@ public class Fachada {
 
     public void logout(Usuario usuario) {
         sistemaUsuarios.logout(usuario);
-    }
-
-    public Collection<?> getSesionesActivas() {
-        return sistemaUsuarios.getSesiones();
-    }
-
-    public Carrera getCarrera(Date fecha, int id) {
-        return sistemaCarrera.getCarrera(fecha, id);
     }
 
     public TableroAdministradorDto obtenerTableroAdministrador() throws ApuestaException {

@@ -13,7 +13,7 @@
     <div class="container">
         <h2>Tablero de control del administrador</h2>
 
-        <nav class="form-group" aria-label="Menu del administrador">
+        <nav class="form-group" aria-label="Menú del administrador">
             <span>Administrador: <strong id="nombreAdministrador">-</strong></span>
             <span>1 - Tablero</span>
             <button id="btnSalir" type="button">2 - Cerrar sesión</button>
@@ -274,7 +274,7 @@
 
         function crearTablaProximasCarreras(carreras) {
             if (!Array.isArray(carreras) || carreras.length === 0) {
-                return '<p>No hay proximas carreras.</p>';
+                return '<p>No hay próximas carreras.</p>';
             }
 
             let html = '<table><thead><tr>';
@@ -283,7 +283,7 @@
             html += '<th>Caballos</th>';
             html += '<th>Total apostado</th>';
             html += '<th>Apuestas</th>';
-            html += '<th>Accion</th>';
+            html += '<th>Acción</th>';
             html += '</tr></thead><tbody>';
 
             carreras.forEach(carrera => {

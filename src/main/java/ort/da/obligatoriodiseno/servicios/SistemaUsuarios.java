@@ -39,10 +39,6 @@ public class SistemaUsuarios {
         usuarios.add(usuario);
     }
 
-    public List<Apuesta> obtenerApuestasDe(Jugador jugador) {
-        return List.copyOf(jugador.getHistorialApuestas());
-    }
-
     public TableroJugadorDto obtenerTableroJugador(Jugador jugador) {
         TableroJugadorDto tablero = new TableroJugadorDto();
         tablero.setNombreJugador(jugador.getNombre());
@@ -79,7 +75,7 @@ public class SistemaUsuarios {
             throw new ApuestaException("Acceso denegado");
         }
         if (tieneSesionActiva(admin)) {
-            throw new ApuestaException("El administrador ya tiene una sesion activa");
+            throw new ApuestaException("El administrador ya tiene una sesión activa");
         }
         sesiones.add(new SesionActiva(admin));
         return admin;
@@ -109,7 +105,4 @@ public class SistemaUsuarios {
         sesiones.removeIf(sesion -> sesion.getUsuario().equals(usuario));
     }
 
-    public Collection<SesionActiva> getSesiones() {
-        return List.copyOf(sesiones);
-    }
 }

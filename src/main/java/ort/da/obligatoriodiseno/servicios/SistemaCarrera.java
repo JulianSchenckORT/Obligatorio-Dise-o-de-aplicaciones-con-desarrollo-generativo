@@ -3,7 +3,6 @@ package ort.da.obligatoriodiseno.servicios;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 import ort.da.obligatoriodiseno.Dominio.Apuesta;
@@ -13,10 +12,8 @@ import ort.da.obligatoriodiseno.Dominio.Jornada;
 import ort.da.obligatoriodiseno.Dominio.RegistroParticipacion;
 import ort.da.obligatoriodiseno.dtos.CaballoParticipanteDto;
 import ort.da.obligatoriodiseno.dtos.CarreraDto;
-import ort.da.obligatoriodiseno.eventos.EventoSistema;
 import ort.da.obligatoriodiseno.eventos.PublicadorEventos;
 import ort.da.obligatoriodiseno.excepciones.ApuestaException;
-import ort.da.obligatoriodiseno.utils.FechaUtils;
 
 public class SistemaCarrera {
     private final SistemaHipodromo sistemaHipodromo;
@@ -30,17 +27,13 @@ public class SistemaCarrera {
     public List<Carrera> getCarrerasDisponibles() {
         List<Carrera> disponibles = new ArrayList<>();
         for (Jornada jornada : sistemaHipodromo.obtenerJornadasOrdenadas()) {
-            for (Carrera carrera : carrerasOrdenadas(jornada)) {
+            for (Carrera carrera : jornada.getCarrerasOrdenadas()) {
                 if (estaDisponibleParaApostar(carrera)) {
                     disponibles.add(carrera);
                 }
             }
         }
         return disponibles;
-    }
-
-    public Carrera getCarrera(Date fecha, int id) {
-        return getCarrera(FechaUtils.toLocalDate(fecha), id);
     }
 
     public Carrera getCarrera(LocalDate fecha, int id) {
@@ -83,7 +76,7 @@ public class SistemaCarrera {
         } catch (IllegalStateException e) {
             throw new ApuestaException(e.getMessage());
         }
-        notificarTablerosActualizados();
+        PublicadorEventos.getInstancia().notificarTablerosActualizados();
         return crearCarreraDto(carrera);
     }
 
@@ -94,7 +87,7 @@ public class SistemaCarrera {
         } catch (IllegalStateException e) {
             throw new ApuestaException(e.getMessage());
         }
-        notificarTablerosActualizados();
+        PublicadorEventos.getInstancia().notificarTablerosActualizados();
         return crearCarreraDto(carrera);
     }
 
@@ -109,7 +102,7 @@ public class SistemaCarrera {
         } catch (IllegalStateException e) {
             throw new ApuestaException(e.getMessage());
         }
-        notificarTablerosActualizados();
+        PublicadorEventos.getInstancia().notificarTablerosActualizados();
         return crearCarreraDto(carrera);
     }
 
@@ -137,7 +130,7 @@ public class SistemaCarrera {
 
     Carrera obtenerCarreraPorRegistro(RegistroParticipacion registro) {
         if (registro == null || registro.getCarrera() == null) {
-            throw new ApuestaException("No se encontro la carrera asociada a la apuesta");
+            throw new ApuestaException("No se encontró la carrera asociada a la apuesta");
         }
         return registro.getCarrera();
     }
@@ -166,19 +159,10 @@ public class SistemaCarrera {
         return carrera;
     }
 
-    private List<Carrera> carrerasOrdenadas(Jornada jornada) {
-        List<Carrera> ordenadas = new ArrayList<>(jornada.GetCarreras());
-        ordenadas.sort(Comparator.comparingInt(Carrera::getNumero));
-        return ordenadas;
-    }
-
     private List<RegistroParticipacion> caballosOrdenados(Carrera carrera) {
         List<RegistroParticipacion> ordenados = new ArrayList<>(carrera.getCaballos());
         ordenados.sort(Comparator.comparingInt(RegistroParticipacion::getId));
         return ordenados;
     }
 
-    private void notificarTablerosActualizados() {
-        PublicadorEventos.getInstancia().notificar(new EventoSistema("TABLEROS_ACTUALIZADOS", null));
-    }
 }

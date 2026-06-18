@@ -28,4 +28,8 @@ public class PublicadorEventos {
             observador.alOcurrir(evento);
         }
     }
+
+    public void notificarTablerosActualizados() {
+        notificar(new EventoSistema("TABLEROS_ACTUALIZADOS", null));
+    }
 }

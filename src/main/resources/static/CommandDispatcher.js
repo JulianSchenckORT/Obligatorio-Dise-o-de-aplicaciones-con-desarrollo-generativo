@@ -162,7 +162,7 @@ class CommandDispatcher {
           this._processCommands(json.commands);
         }
       } catch (error) {
-        this._notifyError(0, 'Evento invalido: ' + error.message);
+        this._notifyError(0, 'Evento inválido: ' + error.message);
       }
     };
     source.onerror = () => {
@@ -218,7 +218,7 @@ class CommandDispatcher {
 
   _formatHttpError(status, text) {
     if (status === 404) {
-      return 'No se encontro el recurso solicitado';
+      return 'No se encontró el recurso solicitado';
     }
     if (status === 405) {
       return 'La accion solicitada no esta disponible';

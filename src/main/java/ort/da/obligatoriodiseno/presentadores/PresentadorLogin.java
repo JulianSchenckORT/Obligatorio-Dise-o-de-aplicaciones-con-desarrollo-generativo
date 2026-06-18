@@ -12,7 +12,10 @@ import ort.da.obligatoriodiseno.Dominio.Usuario;
 
 public abstract class PresentadorLogin<U extends Usuario> {
 
-    private final Fachada fachada = Fachada.getInstancia();
+    static final String CLAVE_JUGADOR = "Jugador";
+    static final String CLAVE_ADMINISTRADOR = "Administrador";
+
+    protected final Fachada fachada = Fachada.getInstancia();
 
     @PostMapping("/login")
     public Commands login(HttpSession sesionHttp,
@@ -37,6 +40,15 @@ public abstract class PresentadorLogin<U extends Usuario> {
         sesionHttp.invalidate();
 
         return Command.lista(new Command("usuarioNoAutenticado", getLoginPage()));
+    }
+
+    static <T extends Usuario> T validarSesion(
+            HttpSession sesionHttp, String clave, Class<T> tipo, String mensajeError) {
+        Object usuario = sesionHttp.getAttribute(clave);
+        if (tipo.isInstance(usuario)) {
+            return tipo.cast(usuario);
+        }
+        throw new ApuestaException(mensajeError);
     }
 
     protected abstract String siguienteCU();

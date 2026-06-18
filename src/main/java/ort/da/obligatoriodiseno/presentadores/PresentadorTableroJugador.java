@@ -70,11 +70,8 @@ public class PresentadorTableroJugador {
     }
 
     private Jugador validarJugador(HttpSession sesionHttp) {
-        Object usuario = sesionHttp.getAttribute("Jugador");
-        if (usuario instanceof Jugador jugador) {
-            return jugador;
-        }
-        throw new ApuestaException("Debe iniciar sesion como jugador");
+        return PresentadorLogin.validarSesion(sesionHttp, PresentadorLogin.CLAVE_JUGADOR,
+                Jugador.class, "Debe iniciar sesión como jugador");
     }
 
     private Apuesta validarApuestaEnCurso(HttpSession sesionHttp) {

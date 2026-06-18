@@ -107,6 +107,18 @@ class ServiciosReorganizacionTests {
     }
 
     @Test
+    void noPermiteConfirmarDosVecesLaMismaApuesta() {
+        Apuesta apuesta = preparar(jugador, 1, 100, "Simple");
+        sistemaApuestas.confirmarApuesta(jugador, apuesta, "clave");
+
+        assertThrows(ApuestaException.class,
+                () -> sistemaApuestas.confirmarApuesta(jugador, apuesta, "clave"));
+        assertEquals(900, jugador.getSaldo(), DELTA);
+        assertEquals(1, jugador.getHistorialApuestas().size());
+        assertEquals(1, carrera.getCantidadApuestas());
+    }
+
+    @Test
     void descartarApuestaNoNecesitaReintegrarSaldo() {
         Apuesta apuesta = preparar(jugador, 1, 100, "Simple");
         sistemaApuestas.descartarApuesta(jugador, apuesta);
@@ -201,7 +213,7 @@ class ServiciosReorganizacionTests {
         Caballo registrado = sistemaCaballo.registrarCaballo("Uno");
 
         assertSame(carrera.getCaballos().getFirst().getCaballo(), registrado);
-        assertEquals(2, sistemaCaballo.getAllCaballos().size());
+        assertSame(registrado, sistemaCaballo.registrarCaballo("Uno"));
         assertThrows(ApuestaException.class,
                 () -> sistemaCarrera.agregarParticipante(new Caballo("Uno"), carrera));
     }

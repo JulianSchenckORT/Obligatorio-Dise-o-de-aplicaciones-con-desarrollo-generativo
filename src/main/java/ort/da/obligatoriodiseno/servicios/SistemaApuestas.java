@@ -14,7 +14,6 @@ import ort.da.obligatoriodiseno.Dominio.Jugador;
 import ort.da.obligatoriodiseno.Dominio.RegistroParticipacion;
 import ort.da.obligatoriodiseno.dtos.ApuestaEnCursoDto;
 import ort.da.obligatoriodiseno.dtos.ApuestaJugadorDto;
-import ort.da.obligatoriodiseno.eventos.EventoSistema;
 import ort.da.obligatoriodiseno.eventos.PublicadorEventos;
 import ort.da.obligatoriodiseno.excepciones.ApuestaException;
 
@@ -88,7 +87,7 @@ public class SistemaApuestas {
                 throw new ApuestaException(e.getMessage());
             }
         }
-        notificarTablerosActualizados();
+        PublicadorEventos.getInstancia().notificarTablerosActualizados();
     }
 
     public void descartarApuesta(Jugador jugador, Apuesta apuesta) {
@@ -155,7 +154,4 @@ public class SistemaApuestas {
         }
     }
 
-    private void notificarTablerosActualizados() {
-        PublicadorEventos.getInstancia().notificar(new EventoSistema("TABLEROS_ACTUALIZADOS", null));
-    }
 }

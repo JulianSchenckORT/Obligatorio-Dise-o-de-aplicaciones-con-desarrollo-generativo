@@ -10,22 +10,15 @@ public class SistemaCaballo {
     private final List<Caballo> caballos = new ArrayList<>();
 
     public Caballo registrarCaballo(String nombre) {
-        if (nombre == null || nombre.isBlank()) {
-            throw new ApuestaException("El nombre del caballo es obligatorio");
-        }
-        Caballo existente = buscarPorNombre(nombre);
-        if (existente != null) {
-            return existente;
-        }
-        Caballo caballo = new Caballo(nombre.trim());
-        caballos.add(caballo);
-        return caballo;
+        validarNombre(nombre);
+        return registrarCaballo(new Caballo(nombre.trim()));
     }
 
     public Caballo registrarCaballo(Caballo caballo) {
         if (caballo == null) {
             throw new ApuestaException("Debe indicar un caballo");
         }
+        validarNombre(caballo.getNombre());
         Caballo existente = buscarPorNombre(caballo.getNombre());
         if (existente != null) {
             return existente;
@@ -34,10 +27,7 @@ public class SistemaCaballo {
         return caballo;
     }
 
-    public Caballo buscarPorNombre(String nombre) {
-        if (nombre == null) {
-            return null;
-        }
+    private Caballo buscarPorNombre(String nombre) {
         for (Caballo caballo : caballos) {
             if (caballo.getNombre().equalsIgnoreCase(nombre.trim())) {
                 return caballo;
@@ -46,7 +36,9 @@ public class SistemaCaballo {
         return null;
     }
 
-    public List<Caballo> getAllCaballos() {
-        return List.copyOf(caballos);
+    private void validarNombre(String nombre) {
+        if (nombre == null || nombre.isBlank()) {
+            throw new ApuestaException("El nombre del caballo es obligatorio");
+        }
     }
 }

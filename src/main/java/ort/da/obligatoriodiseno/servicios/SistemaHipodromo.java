@@ -3,7 +3,6 @@ package ort.da.obligatoriodiseno.servicios;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 import ort.da.obligatoriodiseno.Dominio.Carrera;
@@ -13,7 +12,6 @@ import ort.da.obligatoriodiseno.dtos.CarreraFinalizadaDto;
 import ort.da.obligatoriodiseno.dtos.CarreraPendienteDto;
 import ort.da.obligatoriodiseno.dtos.TableroAdministradorDto;
 import ort.da.obligatoriodiseno.excepciones.ApuestaException;
-import ort.da.obligatoriodiseno.utils.FechaUtils;
 
 public class SistemaHipodromo {
     private static final double PORCENTAJE_COMISION = 0.10;
@@ -112,34 +110,6 @@ public class SistemaHipodromo {
         return armarTablero(obtenerJornadaSiguiente(fecha));
     }
 
-    public Double getTotalApostadoByJornada(Date fecha) {
-        return obtenerJornadaRequerida(FechaUtils.toLocalDate(fecha)).GetTotalApostado();
-    }
-
-    public double calcularBalanceByJornada(Date fecha) {
-        return obtenerJornadaRequerida(FechaUtils.toLocalDate(fecha)).CalcularBalance();
-    }
-
-    public Double getTotalPagadoByJornada(Date fecha) {
-        return obtenerJornadaRequerida(FechaUtils.toLocalDate(fecha)).GetTotalPagado();
-    }
-
-    public double getComisionByJornada(Date fecha) {
-        return hipodromo.getComisionByJornada(obtenerJornadaRequerida(FechaUtils.toLocalDate(fecha)));
-    }
-
-    public List<Carrera> getCarrerasByJornada(Date fecha) {
-        return List.copyOf(obtenerJornadaRequerida(FechaUtils.toLocalDate(fecha)).GetCarreras());
-    }
-
-    private Jornada obtenerJornadaRequerida(LocalDate fecha) {
-        Jornada jornada = obtenerJornada(fecha);
-        if (jornada == null) {
-            throw new ApuestaException("No existe una jornada para la fecha indicada");
-        }
-        return jornada;
-    }
-
     private TableroAdministradorDto armarTablero(Jornada jornada) {
         TableroAdministradorDto dto = new TableroAdministradorDto();
         dto.setFechaJornada(jornada.getFecha());
@@ -149,7 +119,7 @@ public class SistemaHipodromo {
         dto.setBalanceGeneral(jornada.CalcularBalance());
         dto.setCarrerasTotales(jornada.GetCarreras().size());
 
-        for (Carrera carrera : carrerasOrdenadas(jornada)) {
+        for (Carrera carrera : jornada.getCarrerasOrdenadas()) {
             if (carrera.estaFinalizada()) {
                 dto.setCarrerasFinalizadas(dto.getCarrerasFinalizadas() + 1);
                 dto.getCarrerasFinalizadasDetalle().add(crearFinalizadaDto(carrera));
@@ -161,12 +131,6 @@ public class SistemaHipodromo {
         dto.getCarrerasFinalizadasDetalle().sort(
                 Comparator.comparingInt(CarreraFinalizadaDto::getNumero).reversed());
         return dto;
-    }
-
-    private List<Carrera> carrerasOrdenadas(Jornada jornada) {
-        List<Carrera> carreras = new ArrayList<>(jornada.GetCarreras());
-        carreras.sort(Comparator.comparingInt(Carrera::getNumero));
-        return carreras;
     }
 
     private CarreraFinalizadaDto crearFinalizadaDto(Carrera carrera) {
