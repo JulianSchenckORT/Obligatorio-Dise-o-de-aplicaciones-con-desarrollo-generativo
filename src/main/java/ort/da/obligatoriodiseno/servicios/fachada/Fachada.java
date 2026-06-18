@@ -1,10 +1,15 @@
 package ort.da.obligatoriodiseno.servicios.fachada;
+
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
-import java.time.LocalDate;
+import java.util.List;
+
 import ort.da.obligatoriodiseno.Dominio.Admin;
 import ort.da.obligatoriodiseno.Dominio.Apuesta;
+import ort.da.obligatoriodiseno.Dominio.Caballo;
 import ort.da.obligatoriodiseno.Dominio.Carrera;
+import ort.da.obligatoriodiseno.Dominio.Jornada;
 import ort.da.obligatoriodiseno.Dominio.Jugador;
 import ort.da.obligatoriodiseno.Dominio.Usuario;
 import ort.da.obligatoriodiseno.dtos.ApuestaEnCursoDto;
@@ -12,18 +17,27 @@ import ort.da.obligatoriodiseno.dtos.CarreraDto;
 import ort.da.obligatoriodiseno.dtos.TableroAdministradorDto;
 import ort.da.obligatoriodiseno.dtos.TableroJugadorDto;
 import ort.da.obligatoriodiseno.excepciones.ApuestaException;
-import ort.da.obligatoriodiseno.servicios.SistemaUsuarios;
+import ort.da.obligatoriodiseno.servicios.SistemaApuestas;
+import ort.da.obligatoriodiseno.servicios.SistemaCaballo;
 import ort.da.obligatoriodiseno.servicios.SistemaCarrera;
+import ort.da.obligatoriodiseno.servicios.SistemaHipodromo;
+import ort.da.obligatoriodiseno.servicios.SistemaUsuarios;
 
 public class Fachada {
-private static Fachada instancia;
+    private static Fachada instancia;
 
-    private SistemaUsuarios sUsuarios;
-    private SistemaCarrera sCarrera;
+    private final SistemaUsuarios sistemaUsuarios;
+    private final SistemaCarrera sistemaCarrera;
+    private final SistemaHipodromo sistemaHipodromo;
+    private final SistemaCaballo sistemaCaballo;
+    private final SistemaApuestas sistemaApuestas;
 
     private Fachada() {
-        sUsuarios = new SistemaUsuarios();
-        sCarrera = new SistemaCarrera();
+        sistemaHipodromo = new SistemaHipodromo();
+        sistemaCaballo = new SistemaCaballo();
+        sistemaCarrera = new SistemaCarrera(sistemaHipodromo, sistemaCaballo);
+        sistemaApuestas = new SistemaApuestas(sistemaCarrera);
+        sistemaUsuarios = new SistemaUsuarios(sistemaCarrera, sistemaApuestas);
     }
 
     public static Fachada getInstancia() {
@@ -33,85 +47,104 @@ private static Fachada instancia;
         return instancia;
     }
 
+    public void registrarUsuario(Usuario usuario) {
+        sistemaUsuarios.registrarUsuario(usuario);
+    }
+
+    public Jornada registrarJornada(LocalDate fecha) {
+        return sistemaHipodromo.registrarJornada(fecha);
+    }
+
+    public Carrera registrarCarrera(LocalDate fecha, String nombre) {
+        return sistemaCarrera.agregarCarrera(fecha, nombre);
+    }
+
+    public Caballo registrarCaballo(String nombre) {
+        return sistemaCaballo.registrarCaballo(nombre);
+    }
+
+    public void agregarParticipante(Caballo caballo, Carrera carrera) {
+        sistemaCarrera.agregarParticipante(caballo, carrera);
+    }
+
+    public List<Caballo> obtenerCaballos() {
+        return sistemaCaballo.getAllCaballos();
+    }
+
     public Admin loginAdministrador(String nombreUsuario, String contrasenia) throws ApuestaException {
-        return sUsuarios.loginAdministrador(nombreUsuario, contrasenia);
+        return sistemaUsuarios.loginAdministrador(nombreUsuario, contrasenia);
     }
 
     public Jugador loginJugador(String nombreUsuario, String contrasenia) throws ApuestaException {
-        return sUsuarios.loginJugador(nombreUsuario, contrasenia);
+        return sistemaUsuarios.loginJugador(nombreUsuario, contrasenia);
     }
 
-   public void logout(Usuario usuario) {
-		sUsuarios.logout(usuario);
-	}
+    public void logout(Usuario usuario) {
+        sistemaUsuarios.logout(usuario);
+    }
 
     public Collection<?> getSesionesActivas() {
-        return sUsuarios.getSesiones();
+        return sistemaUsuarios.getSesiones();
     }
 
-	public void cargarjornadaFecha(Date fecha) {
-
-	}
-
-	public Carrera getCarrera(Date fecha, int id) {
-		return sCarrera.getCarrera(fecha, id);
-	}
+    public Carrera getCarrera(Date fecha, int id) {
+        return sistemaCarrera.getCarrera(fecha, id);
+    }
 
     public void cerrarSesionesAdministradores() {
-        sUsuarios.cerrarSesionesAdministradores();
+        sistemaUsuarios.cerrarSesionesAdministradores();
     }
 
     public TableroAdministradorDto obtenerTableroAdministrador() throws ApuestaException {
-        return sCarrera.obtenerTableroAdministrador();
+        return sistemaHipodromo.obtenerTableroAdministrador();
     }
 
     public TableroAdministradorDto obtenerTableroAdministrador(LocalDate fecha) throws ApuestaException {
-        return sCarrera.obtenerTableroAdministrador(fecha);
+        return sistemaHipodromo.obtenerTableroAdministrador(fecha);
     }
 
     public TableroAdministradorDto obtenerTableroJornadaAnterior(LocalDate fecha) throws ApuestaException {
-        return sCarrera.obtenerTableroJornadaAnterior(fecha);
+        return sistemaHipodromo.obtenerTableroJornadaAnterior(fecha);
     }
 
     public TableroAdministradorDto obtenerTableroJornadaSiguiente(LocalDate fecha) throws ApuestaException {
-        return sCarrera.obtenerTableroJornadaSiguiente(fecha);
+        return sistemaHipodromo.obtenerTableroJornadaSiguiente(fecha);
     }
 
     public CarreraDto obtenerCarreraParaGestion(LocalDate fecha, int numero) throws ApuestaException {
-        return sCarrera.obtenerCarreraParaGestion(fecha, numero);
+        return sistemaCarrera.obtenerCarreraParaGestion(fecha, numero);
     }
 
     public CarreraDto abrirCarrera(LocalDate fecha, int numero) throws ApuestaException {
-        return sCarrera.abrirCarrera(fecha, numero);
+        return sistemaCarrera.abrirCarrera(fecha, numero);
     }
 
     public CarreraDto cerrarCarrera(LocalDate fecha, int numero) throws ApuestaException {
-        return sCarrera.cerrarCarrera(fecha, numero);
+        return sistemaCarrera.cerrarCarrera(fecha, numero);
     }
 
     public CarreraDto finalizarCarrera(LocalDate fecha, int numero, Integer caballoGanador) throws ApuestaException {
-        return sCarrera.finalizarCarrera(fecha, numero, caballoGanador);
+        return sistemaCarrera.finalizarCarrera(fecha, numero, caballoGanador);
     }
 
     public TableroJugadorDto obtenerTableroJugador(Jugador jugador) {
-        return sCarrera.obtenerTableroJugador(jugador);
+        return sistemaUsuarios.obtenerTableroJugador(jugador);
     }
 
     public Apuesta prepararApuesta(Jugador jugador, int nroCarrera, int nroCaballo, double monto, String tipoApuesta)
             throws ApuestaException {
-        return sCarrera.prepararApuesta(jugador, nroCarrera, nroCaballo, monto, tipoApuesta);
+        return sistemaApuestas.prepararApuesta(jugador, nroCarrera, nroCaballo, monto, tipoApuesta);
     }
 
     public ApuestaEnCursoDto obtenerApuestaEnCurso(Apuesta apuesta) {
-        return sCarrera.obtenerApuestaEnCurso(apuesta);
+        return sistemaApuestas.obtenerApuestaEnCurso(apuesta);
     }
 
     public void confirmarApuesta(Jugador jugador, Apuesta apuesta, String contrasenia) throws ApuestaException {
-        sCarrera.confirmarApuesta(jugador, apuesta, contrasenia);
+        sistemaApuestas.confirmarApuesta(jugador, apuesta, contrasenia);
     }
 
     public void descartarApuesta(Jugador jugador, Apuesta apuesta) {
-        sCarrera.descartarApuesta(jugador, apuesta);
+        sistemaApuestas.descartarApuesta(jugador, apuesta);
     }
-
 }

@@ -1,29 +1,185 @@
 package ort.da.obligatoriodiseno.servicios;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
 import ort.da.obligatoriodiseno.Dominio.Carrera;
+import ort.da.obligatoriodiseno.Dominio.Hipodromo;
+import ort.da.obligatoriodiseno.Dominio.Jornada;
+import ort.da.obligatoriodiseno.dtos.CarreraFinalizadaDto;
+import ort.da.obligatoriodiseno.dtos.CarreraPendienteDto;
+import ort.da.obligatoriodiseno.dtos.TableroAdministradorDto;
+import ort.da.obligatoriodiseno.excepciones.ApuestaException;
+import ort.da.obligatoriodiseno.utils.FechaUtils;
 
 public class SistemaHipodromo {
+    private static final double PORCENTAJE_COMISION = 0.10;
 
-	public Double GetTotalApostadoByJornada(Date fecha) {
-		return null;
-	}
+    private final Hipodromo hipodromo;
 
-	public double CalcularBalanceByJornada(Date fecha) {
-		return 0;
-	}
+    public SistemaHipodromo() {
+        this.hipodromo = new Hipodromo(PORCENTAJE_COMISION);
+    }
 
-	public Double getTotalPagadoByJornada(Date fecha) {
-		return null;
-	}
+    public Jornada registrarJornada(LocalDate fecha) {
+        if (fecha == null) {
+            throw new ApuestaException("Debe indicar la fecha de la jornada");
+        }
+        if (obtenerJornada(fecha) != null) {
+            throw new ApuestaException("Ya existe una jornada para la fecha indicada");
+        }
+        return new Jornada(fecha, hipodromo);
+    }
 
-	public double getComisionByJornada(Date fecha) {
-		return 0;
-	}
+    public Jornada obtenerJornada(LocalDate fecha) {
+        for (Jornada jornada : hipodromo.getListaJornadas()) {
+            if (jornada.getFecha().equals(fecha)) {
+                return jornada;
+            }
+        }
+        return null;
+    }
 
-	public List<Carrera> getCarrerasByJornada(Date fecha) {
-		return null;
-	}
+    public Jornada obtenerJornadaActual() throws ApuestaException {
+        Jornada actual = null;
+        LocalDate hoy = LocalDate.now();
+        for (Jornada jornada : hipodromo.getListaJornadas()) {
+            if (!jornada.getFecha().isAfter(hoy)
+                    && (actual == null || jornada.getFecha().isAfter(actual.getFecha()))) {
+                actual = jornada;
+            }
+        }
+        if (actual == null) {
+            throw new ApuestaException("No hay jornadas disponibles para mostrar");
+        }
+        return actual;
+    }
 
+    public Jornada obtenerJornadaAnterior(LocalDate fecha) throws ApuestaException {
+        Jornada anterior = null;
+        for (Jornada jornada : hipodromo.getListaJornadas()) {
+            if (jornada.getFecha().isBefore(fecha)
+                    && (anterior == null || jornada.getFecha().isAfter(anterior.getFecha()))) {
+                anterior = jornada;
+            }
+        }
+        if (anterior == null) {
+            throw new ApuestaException("No hay una jornada anterior disponible");
+        }
+        return anterior;
+    }
+
+    public Jornada obtenerJornadaSiguiente(LocalDate fecha) throws ApuestaException {
+        Jornada siguiente = null;
+        for (Jornada jornada : hipodromo.getListaJornadas()) {
+            if (jornada.getFecha().isAfter(fecha)
+                    && (siguiente == null || jornada.getFecha().isBefore(siguiente.getFecha()))) {
+                siguiente = jornada;
+            }
+        }
+        if (siguiente == null) {
+            throw new ApuestaException("No hay una jornada siguiente disponible");
+        }
+        return siguiente;
+    }
+
+    public List<Jornada> obtenerJornadasOrdenadas() {
+        List<Jornada> jornadas = new ArrayList<>(hipodromo.getListaJornadas());
+        jornadas.sort(Comparator.comparing(Jornada::getFecha));
+        return jornadas;
+    }
+
+    public TableroAdministradorDto obtenerTableroAdministrador() throws ApuestaException {
+        return armarTablero(obtenerJornadaActual());
+    }
+
+    public TableroAdministradorDto obtenerTableroAdministrador(LocalDate fecha) throws ApuestaException {
+        Jornada jornada = obtenerJornada(fecha);
+        if (jornada == null) {
+            throw new ApuestaException("No existe una jornada para la fecha indicada");
+        }
+        return armarTablero(jornada);
+    }
+
+    public TableroAdministradorDto obtenerTableroJornadaAnterior(LocalDate fecha) throws ApuestaException {
+        return armarTablero(obtenerJornadaAnterior(fecha));
+    }
+
+    public TableroAdministradorDto obtenerTableroJornadaSiguiente(LocalDate fecha) throws ApuestaException {
+        return armarTablero(obtenerJornadaSiguiente(fecha));
+    }
+
+    public Double getTotalApostadoByJornada(Date fecha) {
+        return obtenerJornadaRequerida(FechaUtils.toLocalDate(fecha)).GetTotalApostado();
+    }
+
+    public double calcularBalanceByJornada(Date fecha) {
+        return obtenerJornadaRequerida(FechaUtils.toLocalDate(fecha)).CalcularBalance();
+    }
+
+    public Double getTotalPagadoByJornada(Date fecha) {
+        return obtenerJornadaRequerida(FechaUtils.toLocalDate(fecha)).GetTotalPagado();
+    }
+
+    public double getComisionByJornada(Date fecha) {
+        return hipodromo.getComisionByJornada(obtenerJornadaRequerida(FechaUtils.toLocalDate(fecha)));
+    }
+
+    public List<Carrera> getCarrerasByJornada(Date fecha) {
+        return List.copyOf(obtenerJornadaRequerida(FechaUtils.toLocalDate(fecha)).GetCarreras());
+    }
+
+    private Jornada obtenerJornadaRequerida(LocalDate fecha) {
+        Jornada jornada = obtenerJornada(fecha);
+        if (jornada == null) {
+            throw new ApuestaException("No existe una jornada para la fecha indicada");
+        }
+        return jornada;
+    }
+
+    private TableroAdministradorDto armarTablero(Jornada jornada) {
+        TableroAdministradorDto dto = new TableroAdministradorDto();
+        dto.setFechaJornada(jornada.getFecha());
+        dto.setTotalApostado(jornada.GetTotalApostado());
+        dto.setTotalPagado(jornada.GetTotalPagado());
+        dto.setComisiones(hipodromo.getComisionByJornada(jornada));
+        dto.setBalanceGeneral(jornada.CalcularBalance());
+        dto.setCarrerasTotales(jornada.GetCarreras().size());
+
+        for (Carrera carrera : carrerasOrdenadas(jornada)) {
+            if (carrera.estaFinalizada()) {
+                dto.setCarrerasFinalizadas(dto.getCarrerasFinalizadas() + 1);
+                dto.getCarrerasFinalizadasDetalle().add(crearFinalizadaDto(carrera));
+            } else {
+                dto.setCarrerasFaltanCorrer(dto.getCarrerasFaltanCorrer() + 1);
+                dto.getProximasCarreras().add(crearPendienteDto(carrera));
+            }
+        }
+        dto.getCarrerasFinalizadasDetalle().sort(Comparator
+                .comparing(CarreraFinalizadaDto::getHoraFin, Comparator.nullsLast(String::compareTo))
+                .thenComparing(CarreraFinalizadaDto::getNumero));
+        return dto;
+    }
+
+    private List<Carrera> carrerasOrdenadas(Jornada jornada) {
+        List<Carrera> carreras = new ArrayList<>(jornada.GetCarreras());
+        carreras.sort(Comparator.comparingInt(Carrera::getNumero));
+        return carreras;
+    }
+
+    private CarreraFinalizadaDto crearFinalizadaDto(Carrera carrera) {
+        String hora = carrera.getHoraFinal() == null ? "" : carrera.getHoraFinal().toString();
+        String ganador = carrera.getGanador() == null ? "" : carrera.getGanador().getCaballo().getNombre();
+        double dividendo = carrera.getGanador() == null ? 0 : carrera.getGanador().getDividendo();
+        return new CarreraFinalizadaDto(carrera.getNumero(), hora, carrera.getCaballos().size(),
+                carrera.getTotalApostado(), carrera.getTotalPagado(), ganador, dividendo);
+    }
+
+    private CarreraPendienteDto crearPendienteDto(Carrera carrera) {
+        return new CarreraPendienteDto(carrera.getNumero(), carrera.getNombreEstado(), carrera.getCaballos().size(),
+                carrera.getTotalApostado(), carrera.getCantidadApuestas());
+    }
 }

@@ -6,44 +6,69 @@ import java.util.List;
 
 import ort.da.obligatoriodiseno.Dominio.Admin;
 import ort.da.obligatoriodiseno.Dominio.Apuesta;
+import ort.da.obligatoriodiseno.Dominio.Carrera;
 import ort.da.obligatoriodiseno.Dominio.Jugador;
 import ort.da.obligatoriodiseno.Dominio.SesionActiva;
 import ort.da.obligatoriodiseno.Dominio.Usuario;
+import ort.da.obligatoriodiseno.dtos.TableroJugadorDto;
 import ort.da.obligatoriodiseno.excepciones.ApuestaException;
+import ort.da.obligatoriodiseno.utils.TextoUtils;
 
 public class SistemaUsuarios {
+    private final List<Usuario> usuarios;
+    private final Collection<SesionActiva> sesiones;
+    private final SistemaCarrera sistemaCarrera;
+    private final SistemaApuestas sistemaApuestas;
 
-    private List<Usuario> usuarios;
-    private Collection<SesionActiva> sesiones;
-
-    public SistemaUsuarios() {
+    public SistemaUsuarios(SistemaCarrera sistemaCarrera, SistemaApuestas sistemaApuestas) {
         this.usuarios = new ArrayList<>();
         this.sesiones = new ArrayList<>();
-        precargarUsuarios();
-    }
-// las precargas van en obligatoriodisenoApplication
-    private void precargarUsuarios() {
-        usuarios.add(new Admin("a1", "a1", "Usuario Administrador"));
-        usuarios.add(new Admin("a2", "a2", "Segundo Administrador"));
-        usuarios.add(new Jugador("j1", "j1", "Usuario Jugador", 2000));
-        usuarios.add(new Jugador("j2", "j2", "Segundo Jugador", 3000));
+        this.sistemaCarrera = sistemaCarrera;
+        this.sistemaApuestas = sistemaApuestas;
     }
 
-    public Apuesta GetApuestaByJugador(int jugador) {
-        return null;
+    public void registrarUsuario(Usuario usuario) {
+        if (usuario == null || usuario.getUsername() == null || usuario.getUsername().isBlank()) {
+            throw new ApuestaException("Debe indicar un usuario");
+        }
+        boolean existe = usuarios.stream()
+                .anyMatch(registrado -> registrado.getUsername().equalsIgnoreCase(usuario.getUsername()));
+        if (existe) {
+            throw new ApuestaException("Ya existe un usuario con ese nombre");
+        }
+        usuarios.add(usuario);
+    }
+
+    public List<Apuesta> obtenerApuestasDe(Jugador jugador) {
+        return List.copyOf(jugador.getHistorialApuestas());
+    }
+
+    public TableroJugadorDto obtenerTableroJugador(Jugador jugador) {
+        TableroJugadorDto tablero = new TableroJugadorDto();
+        tablero.setNombreJugador(jugador.getNombre());
+        tablero.setIniciales(TextoUtils.obtenerIniciales(jugador.getNombre()));
+        tablero.setSaldoActual(jugador.getSaldo());
+        tablero.setTotalApostado(jugador.calcularTotalApostado());
+        tablero.setTotalGanado(jugador.getGanancias());
+
+        for (Carrera carrera : sistemaCarrera.getCarrerasDisponibles()) {
+            tablero.getCarrerasDisponibles().add(sistemaCarrera.crearCarreraDto(carrera));
+        }
+        for (Apuesta apuesta : sistemaApuestas.obtenerApuestasOrdenadas(jugador)) {
+            tablero.getMisApuestas().add(sistemaApuestas.crearApuestaJugadorDto(apuesta));
+        }
+        return tablero;
     }
 
     private Usuario login(String nombre, String contrasenia) throws ApuestaException {
         if (nombre == null || nombre.isBlank() || contrasenia == null || contrasenia.isBlank()) {
             throw new ApuestaException("Debe ingresar usuario y contrasena");
         }
-
         for (Usuario usuario : usuarios) {
             if (usuario.esPasswordDe(nombre, contrasenia)) {
                 return usuario;
             }
         }
-
         throw new ApuestaException("Usuario o contrasena incorrectos");
     }
 
@@ -80,17 +105,7 @@ public class SistemaUsuarios {
     }
 
     public void logout(Usuario usuario) {
-        SesionActiva sesionABorrar = null;
-
-        for (SesionActiva sesion : sesiones) {
-            if (sesion.getUsuario().equals(usuario)) {
-                sesionABorrar = sesion;
-            }
-        }
-
-        if (sesionABorrar != null) {
-            sesiones.remove(sesionABorrar);
-        }
+        sesiones.removeIf(sesion -> sesion.getUsuario().equals(usuario));
     }
 
     public void cerrarSesionesAdministradores() {
@@ -98,6 +113,6 @@ public class SistemaUsuarios {
     }
 
     public Collection<SesionActiva> getSesiones() {
-        return sesiones;
+        return List.copyOf(sesiones);
     }
 }
