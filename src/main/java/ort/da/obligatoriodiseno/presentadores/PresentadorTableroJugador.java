@@ -1,5 +1,8 @@
 package ort.da.obligatoriodiseno.presentadores;
 
+import java.time.LocalDate;
+
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +31,7 @@ public class PresentadorTableroJugador {
 
     @PostMapping("/preparar")
     public Commands prepararApuesta(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
             @RequestParam int nroCarrera,
             @RequestParam int nroCaballo,
             @RequestParam double monto,
@@ -35,7 +39,7 @@ public class PresentadorTableroJugador {
             HttpSession sesionHttp) {
 
         Jugador jugador = validarJugador(sesionHttp);
-        Apuesta apuesta = fachada.prepararApuesta(jugador, nroCarrera, nroCaballo, monto, tipoApuesta);
+        Apuesta apuesta = fachada.prepararApuesta(jugador, fecha, nroCarrera, nroCaballo, monto, tipoApuesta);
         sesionHttp.setAttribute("ApuestaEnCurso", apuesta);
         return Command.lista(new Command("apuestaPreparada", "jugador/confirmar-apuesta.html"));
     }
@@ -78,7 +82,7 @@ public class PresentadorTableroJugador {
         if (apuesta instanceof Apuesta apuestaEnCurso) {
             return apuestaEnCurso;
         }
-        throw new ApuestaException("No hay una apuesta pendiente de confirmacion");
+        throw new ApuestaException("No hay apuesta en curso");
     }
 
 }

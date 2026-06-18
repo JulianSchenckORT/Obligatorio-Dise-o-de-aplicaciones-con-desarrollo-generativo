@@ -16,6 +16,7 @@ public class TableroJugadorDto {
     private double saldoActual;
     private double totalApostado;
     private double totalGanado;
+    private List<String> modalidadesApuesta = new ArrayList<>();
     private List<CarreraDto> carrerasDisponibles = new ArrayList<>();
     private List<ApuestaJugadorDto> misApuestas = new ArrayList<>();
 }

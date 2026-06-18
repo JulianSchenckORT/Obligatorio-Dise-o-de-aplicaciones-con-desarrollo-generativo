@@ -381,11 +381,7 @@
         <section id="carrerasDisponibles" class="race-grid"></section>
 
         <h2 class="section-title">Tipos de apuesta disponibles</h2>
-        <div class="bet-types">
-            <button class="type-btn active" type="button" data-tipo="Simple">Simple</button>
-            <button class="type-btn" type="button" data-tipo="Multiple">Multiple</button>
-            <button class="type-btn" type="button" data-tipo="Super">Super</button>
-        </div>
+        <div id="tiposApuesta" class="bet-types"></div>
 
         <h2 class="section-title">Mis apuestas</h2>
         <section class="bets-table-wrap">
@@ -410,17 +406,9 @@
     </main>
 
     <script>
-        let tipoSeleccionado = 'Simple';
+        let tipoSeleccionado = null;
 
         document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.type-btn').forEach((boton) => {
-                boton.addEventListener('click', () => {
-                    document.querySelectorAll('.type-btn').forEach((btn) => btn.classList.remove('active'));
-                    boton.classList.add('active');
-                    tipoSeleccionado = boton.dataset.tipo;
-                });
-            });
-
             const vistaTablero = CommandDispatcher.registerView('TableroJugador', {
                 onException: async (msg) => await mostrarMensaje(msg),
                 onError: async (status, text) => await mostrarMensaje('Error ' + status + ': ' + text)
@@ -454,13 +442,14 @@
             document.getElementById('saldoActual').textContent = formatearMonto(tablero.saldoActual);
             document.getElementById('totalApostado').textContent = formatearMonto(tablero.totalApostado);
             document.getElementById('totalGanado').textContent = formatearMonto(tablero.totalGanado);
+            mostrarModalidades(tablero.modalidadesApuesta || []);
             document.getElementById('carrerasDisponibles').innerHTML = crearCarreras(tablero.carrerasDisponibles || []);
             document.getElementById('misApuestas').innerHTML = crearApuestas(tablero.misApuestas || []);
         }
 
         function crearCarreras(carreras) {
             if (carreras.length === 0) {
-                return '<p class="empty">No hay carreras disponibles.</p>';
+                return '<p class="empty">No hay carreras abiertas</p>';
             }
 
             return carreras.map((carrera) => `
@@ -489,7 +478,7 @@
                                     <td class="dividend">${formatearDividendo(caballo.dividendoActual)}</td>
                                     <td>
                                         <button class="bet-btn" type="button"
-                                            onclick="prepararApuesta(${carrera.numero}, ${caballo.numero})">
+                                            onclick="prepararApuesta('${carrera.fecha}', ${carrera.numero}, ${caballo.numero})">
                                             Apostar
                                         </button>
                                     </td>
@@ -517,24 +506,53 @@
                     <td>${escapar(apuesta.tipoApuesta)}</td>
                     <td>${Number(apuesta.dividendoFinal || 0).toFixed(2)}</td>
                     <td class="paid">${formatearMonto(apuesta.montoCobrado)}</td>
-                    <td><span class="status ${apuesta.estado === 'FINALIZADA' ? 'done' : 'pending'}">${escapar(apuesta.estado)}</span></td>
+                    <td><span class="status ${apuesta.estado === 'Finalizada' ? 'done' : 'pending'}">${escapar(apuesta.estado)}</span></td>
                 </tr>
             `).join('');
         }
 
-        function prepararApuesta(nroCarrera, nroCaballo) {
+        function mostrarModalidades(modalidades) {
+            const contenedor = document.getElementById('tiposApuesta');
+            if (!Array.isArray(modalidades) || modalidades.length === 0) {
+                tipoSeleccionado = null;
+                contenedor.innerHTML = '<p class="empty">No hay tipos de apuesta definidos.</p>';
+                return;
+            }
+
+            if (!tipoSeleccionado || !modalidades.includes(tipoSeleccionado)) {
+                tipoSeleccionado = modalidades[0];
+            }
+            contenedor.innerHTML = modalidades.map((modalidad) => `
+                <button class="type-btn ${modalidad === tipoSeleccionado ? 'active' : ''}"
+                        type="button" data-tipo="${escapar(modalidad)}">${escapar(modalidad)}</button>
+            `).join('');
+            contenedor.querySelectorAll('.type-btn').forEach((boton) => {
+                boton.addEventListener('click', () => {
+                    contenedor.querySelectorAll('.type-btn').forEach((btn) => btn.classList.remove('active'));
+                    boton.classList.add('active');
+                    tipoSeleccionado = boton.dataset.tipo;
+                });
+            });
+        }
+
+        function prepararApuesta(fecha, nroCarrera, nroCaballo) {
+            if (!tipoSeleccionado) {
+                mostrarMensaje('Debe seleccionar un tipo de apuesta');
+                return;
+            }
             const montoIngresado = prompt('Monto a apostar:', '1500');
             if (montoIngresado === null) {
                 return;
             }
 
             const monto = Number(String(montoIngresado).replace(',', '.'));
-            if (!Number.isFinite(monto) || monto <= 0) {
-                mostrarMensaje('El monto de la apuesta debe ser mayor a cero');
+            if (!Number.isFinite(monto) || monto < 1) {
+                mostrarMensaje('Monto inválido');
                 return;
             }
 
             CommandDispatcher.submit('/jugador/apuestas/preparar', {
+                fecha,
                 nroCarrera,
                 nroCaballo,
                 monto,

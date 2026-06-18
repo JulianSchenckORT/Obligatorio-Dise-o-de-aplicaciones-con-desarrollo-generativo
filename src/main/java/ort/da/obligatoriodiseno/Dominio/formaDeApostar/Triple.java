@@ -3,17 +3,19 @@ package ort.da.obligatoriodiseno.Dominio.formaDeApostar;
 import ort.da.obligatoriodiseno.Dominio.FormaDeApostar;
 
 public class Triple extends FormaDeApostar {
-	@Override
-	public double calcularPago(double monto, double dividendo, double total) {
-    if (total < 100000) {
-        return monto * dividendo * 2;
-    } else {
-        return monto * dividendo * 3;
+    @Override
+    public String getNombre() {
+        return "Triple";
     }
-}
-	@Override
-public double calcularCosto(double monto) {
-	return monto * 1.5;
 
-	}
+    @Override
+    public double calcularPago(double monto, double dividendo, double totalApostadoCaballo) {
+        double multiplicador = totalApostadoCaballo < 100000 ? 2 : 3;
+        return monto * dividendo * multiplicador;
+    }
+
+    @Override
+    public double calcularCosto(double monto) {
+        return monto * 1.5;
+    }
 }

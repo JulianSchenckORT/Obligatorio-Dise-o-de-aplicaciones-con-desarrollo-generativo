@@ -3,18 +3,19 @@ package ort.da.obligatoriodiseno.Dominio.formaDeApostar;
 import ort.da.obligatoriodiseno.Dominio.FormaDeApostar;
 
 public class Super extends FormaDeApostar {
-	@Override
-	
-public double calcularPago(double monto, double dividendo,double total) {
-    if (dividendo >= 2) {
-        return monto * dividendo * 3;
-    } else {
-        return monto * dividendo * 4;
+    @Override
+    public String getNombre() {
+        return "Súper";
     }
-}
-public double calcularCosto(double monto) {
-	return monto * 2;
 
+    @Override
+    public double calcularPago(double monto, double dividendo, double totalApostadoCaballo) {
+        double multiplicador = dividendo >= 2 ? 3 : 4;
+        return monto * dividendo * multiplicador;
+    }
 
-}
+    @Override
+    public double calcularCosto(double monto) {
+        return monto * 2;
+    }
 }

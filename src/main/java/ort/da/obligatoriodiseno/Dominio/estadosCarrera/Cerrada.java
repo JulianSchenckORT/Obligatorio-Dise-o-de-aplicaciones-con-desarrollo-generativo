@@ -18,12 +18,12 @@ public class Cerrada implements EstadoCarrera {
 
     @Override
     public void abrir(Carrera carrera) {
-        throw new IllegalStateException("No se puede abrir una carrera cerrada");
+        throw new IllegalStateException("No se puede abrir esta carrera.");
     }
 
     @Override
     public void cerrar(Carrera carrera) {
-        throw new IllegalStateException("La carrera ya esta cerrada");
+        throw new IllegalStateException("No es posible cerrar esta carrera");
     }
 
     @Override

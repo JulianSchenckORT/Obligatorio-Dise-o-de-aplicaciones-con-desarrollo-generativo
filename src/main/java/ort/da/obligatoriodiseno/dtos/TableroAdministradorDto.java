@@ -12,6 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class TableroAdministradorDto {
+    private String nombreAdministrador;
     private LocalDate fechaJornada;
     private double totalApostado;
     private double totalPagado;

@@ -288,8 +288,8 @@
             </div>
 
             <form id="formConfirmar" class="password-box" onsubmit="confirmarApuesta(event)">
-                <h2>Ingresar contrasena</h2>
-                <label for="contrasenia">Contrasena</label>
+                <h2>Ingresar contraseña</h2>
+                <label for="contrasenia">Contraseña</label>
                 <input id="contrasenia" name="contrasenia" type="password" autocomplete="current-password" required>
 
                 <div class="actions">
@@ -321,7 +321,7 @@
             document.getElementById('carrera').textContent = apuesta.numeroCarrera + ' - ' + apuesta.nombreCarrera;
             document.getElementById('caballo').textContent = 'Nro. ' + apuesta.numeroCaballo + ' - ' + apuesta.nombreCaballo;
             document.getElementById('tipoApuesta').textContent = apuesta.tipoApuesta;
-            document.getElementById('dividendo').textContent = Number(apuesta.dividendoActual || 0).toFixed(2);
+            document.getElementById('dividendo').textContent = formatearDividendo(apuesta.dividendoActual);
             document.getElementById('montoApostado').textContent = formatearMonto(apuesta.montoApostado);
             document.getElementById('montoDebitar').textContent = formatearMonto(apuesta.montoDebitar);
             document.getElementById('montoPotencial').textContent = formatearMonto(apuesta.montoPotencial);
@@ -338,6 +338,11 @@
 
         function formatearMonto(valor) {
             return '$' + Number(valor || 0).toLocaleString('es-UY');
+        }
+
+        function formatearDividendo(valor) {
+            const dividendo = Number(valor || 0);
+            return dividendo > 1 ? dividendo.toFixed(2) : 'S/E';
         }
     </script>
 </body>

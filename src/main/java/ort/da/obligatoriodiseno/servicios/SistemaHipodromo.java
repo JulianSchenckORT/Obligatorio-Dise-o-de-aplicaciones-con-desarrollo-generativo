@@ -53,7 +53,7 @@ public class SistemaHipodromo {
             }
         }
         if (actual == null) {
-            throw new ApuestaException("No hay jornadas disponibles para mostrar");
+            throw new ApuestaException("No hay jornadas definidas en el sistema");
         }
         return actual;
     }
@@ -158,9 +158,8 @@ public class SistemaHipodromo {
                 dto.getProximasCarreras().add(crearPendienteDto(carrera));
             }
         }
-        dto.getCarrerasFinalizadasDetalle().sort(Comparator
-                .comparing(CarreraFinalizadaDto::getHoraFin, Comparator.nullsLast(String::compareTo))
-                .thenComparing(CarreraFinalizadaDto::getNumero));
+        dto.getCarrerasFinalizadasDetalle().sort(
+                Comparator.comparingInt(CarreraFinalizadaDto::getNumero).reversed());
         return dto;
     }
 
@@ -173,7 +172,7 @@ public class SistemaHipodromo {
     private CarreraFinalizadaDto crearFinalizadaDto(Carrera carrera) {
         String hora = carrera.getHoraFinal() == null ? "" : carrera.getHoraFinal().toString();
         String ganador = carrera.getGanador() == null ? "" : carrera.getGanador().getCaballo().getNombre();
-        double dividendo = carrera.getGanador() == null ? 0 : carrera.getGanador().getDividendo();
+        double dividendo = carrera.getGanador() == null ? 0 : carrera.getGanador().getDividendoFinal();
         return new CarreraFinalizadaDto(carrera.getNumero(), hora, carrera.getCaballos().size(),
                 carrera.getTotalApostado(), carrera.getTotalPagado(), ganador, dividendo);
     }

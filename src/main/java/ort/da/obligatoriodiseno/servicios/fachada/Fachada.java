@@ -11,6 +11,7 @@ import ort.da.obligatoriodiseno.Dominio.Caballo;
 import ort.da.obligatoriodiseno.Dominio.Carrera;
 import ort.da.obligatoriodiseno.Dominio.Jornada;
 import ort.da.obligatoriodiseno.Dominio.Jugador;
+import ort.da.obligatoriodiseno.Dominio.FormaDeApostar;
 import ort.da.obligatoriodiseno.Dominio.Usuario;
 import ort.da.obligatoriodiseno.dtos.ApuestaEnCursoDto;
 import ort.da.obligatoriodiseno.dtos.CarreraDto;
@@ -21,6 +22,7 @@ import ort.da.obligatoriodiseno.servicios.SistemaApuestas;
 import ort.da.obligatoriodiseno.servicios.SistemaCaballo;
 import ort.da.obligatoriodiseno.servicios.SistemaCarrera;
 import ort.da.obligatoriodiseno.servicios.SistemaHipodromo;
+import ort.da.obligatoriodiseno.servicios.SistemaModalidadesApuesta;
 import ort.da.obligatoriodiseno.servicios.SistemaUsuarios;
 
 public class Fachada {
@@ -31,13 +33,15 @@ public class Fachada {
     private final SistemaHipodromo sistemaHipodromo;
     private final SistemaCaballo sistemaCaballo;
     private final SistemaApuestas sistemaApuestas;
+    private final SistemaModalidadesApuesta sistemaModalidades;
 
     private Fachada() {
         sistemaHipodromo = new SistemaHipodromo();
         sistemaCaballo = new SistemaCaballo();
         sistemaCarrera = new SistemaCarrera(sistemaHipodromo, sistemaCaballo);
-        sistemaApuestas = new SistemaApuestas(sistemaCarrera);
-        sistemaUsuarios = new SistemaUsuarios(sistemaCarrera, sistemaApuestas);
+        sistemaModalidades = new SistemaModalidadesApuesta();
+        sistemaApuestas = new SistemaApuestas(sistemaCarrera, sistemaModalidades);
+        sistemaUsuarios = new SistemaUsuarios(sistemaCarrera, sistemaApuestas, sistemaModalidades);
     }
 
     public static Fachada getInstancia() {
@@ -71,6 +75,10 @@ public class Fachada {
         return sistemaCaballo.getAllCaballos();
     }
 
+    public void registrarModalidad(FormaDeApostar modalidad) {
+        sistemaModalidades.registrar(modalidad);
+    }
+
     public Admin loginAdministrador(String nombreUsuario, String contrasenia) throws ApuestaException {
         return sistemaUsuarios.loginAdministrador(nombreUsuario, contrasenia);
     }
@@ -89,10 +97,6 @@ public class Fachada {
 
     public Carrera getCarrera(Date fecha, int id) {
         return sistemaCarrera.getCarrera(fecha, id);
-    }
-
-    public void cerrarSesionesAdministradores() {
-        sistemaUsuarios.cerrarSesionesAdministradores();
     }
 
     public TableroAdministradorDto obtenerTableroAdministrador() throws ApuestaException {
@@ -131,9 +135,9 @@ public class Fachada {
         return sistemaUsuarios.obtenerTableroJugador(jugador);
     }
 
-    public Apuesta prepararApuesta(Jugador jugador, int nroCarrera, int nroCaballo, double monto, String tipoApuesta)
-            throws ApuestaException {
-        return sistemaApuestas.prepararApuesta(jugador, nroCarrera, nroCaballo, monto, tipoApuesta);
+    public Apuesta prepararApuesta(Jugador jugador, LocalDate fecha, int nroCarrera, int nroCaballo,
+            double monto, String tipoApuesta) throws ApuestaException {
+        return sistemaApuestas.prepararApuesta(jugador, fecha, nroCarrera, nroCaballo, monto, tipoApuesta);
     }
 
     public ApuestaEnCursoDto obtenerApuestaEnCurso(Apuesta apuesta) {

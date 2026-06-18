@@ -16,7 +16,7 @@ public class EnCurso implements EstadoApuesta {
     }
 
     @Override
-    public void Pagar(double ganancias, Jugador jugador) {
+    public void pagar(double ganancias, Jugador jugador) {
         throw new IllegalStateException("No se puede pagar una apuesta en curso");
     }
 }

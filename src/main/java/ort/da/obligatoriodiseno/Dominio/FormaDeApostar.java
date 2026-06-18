@@ -1,12 +1,9 @@
 package ort.da.obligatoriodiseno.Dominio;
 
 public abstract class FormaDeApostar {
+    public abstract String getNombre();
 
-    public double calcularPago(double monto, double dividendo, double total) {
-        return 0;
-    }
+    public abstract double calcularPago(double monto, double dividendo, double totalApostadoCaballo);
 
-    public double calcularCosto(double monto) {
-        return monto;
-    }
+    public abstract double calcularCosto(double monto);
 }

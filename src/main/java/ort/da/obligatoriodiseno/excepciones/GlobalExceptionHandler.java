@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
 
     private String nombreParametro(String nombreTecnico) {
         if ("contrasenia".equals(nombreTecnico)) {
-            return "contrasena";
+            return "contraseña";
         }
         if ("nroCarrera".equals(nombreTecnico)) {
             return "numero de carrera";

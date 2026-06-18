@@ -1,6 +1,6 @@
 package ort.da.obligatoriodiseno.Dominio;
-public interface  EstadoApuesta {
+public interface EstadoApuesta {
     void confirmar(Apuesta apuesta);
     void descartar(Apuesta apuesta);
-    void Pagar(double ganancias,Jugador jugador);
+    void pagar(double ganancias, Jugador jugador);
 }

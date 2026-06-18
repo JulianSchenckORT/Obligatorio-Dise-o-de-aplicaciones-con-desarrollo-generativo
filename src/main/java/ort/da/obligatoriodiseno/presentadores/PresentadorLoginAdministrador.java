@@ -53,10 +53,4 @@ public class PresentadorLoginAdministrador extends PresentadorLogin<Admin> {
         return "Administrador";
     }
 
-    @PostMapping("/liberar-sesiones")
-    public Commands liberarSesiones(HttpSession sesionHttp) {
-        fachada.cerrarSesionesAdministradores();
-        sesionHttp.invalidate();
-        return Command.lista(new Command("mensaje", "Sesiones de administradores liberadas"));
-    }
 }

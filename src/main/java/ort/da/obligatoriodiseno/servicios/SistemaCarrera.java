@@ -31,7 +31,7 @@ public class SistemaCarrera {
         List<Carrera> disponibles = new ArrayList<>();
         for (Jornada jornada : sistemaHipodromo.obtenerJornadasOrdenadas()) {
             for (Carrera carrera : carrerasOrdenadas(jornada)) {
-                if ("ABIERTA".equals(carrera.getNombreEstado()) || "ESTABLE".equals(carrera.getNombreEstado())) {
+                if (estaDisponibleParaApostar(carrera)) {
                     disponibles.add(carrera);
                 }
             }
@@ -113,13 +113,17 @@ public class SistemaCarrera {
         return crearCarreraDto(carrera);
     }
 
-    Carrera buscarCarreraDisponible(int nroCarrera) throws ApuestaException {
-        for (Carrera carrera : getCarrerasDisponibles()) {
-            if (carrera.getNumero() == nroCarrera) {
-                return carrera;
-            }
+    Carrera buscarCarreraDisponible(LocalDate fecha, int nroCarrera) throws ApuestaException {
+        Carrera carrera = getCarrera(fecha, nroCarrera);
+        if (carrera != null && estaDisponibleParaApostar(carrera)) {
+            return carrera;
         }
-        throw new ApuestaException("La carrera seleccionada no esta disponible para apostar");
+        throw new ApuestaException("Esta carrera ya no recibe apuestas");
+    }
+
+    boolean estaDisponibleParaApostar(Carrera carrera) {
+        return carrera != null && ("ABIERTA".equals(carrera.getNombreEstado())
+                || "ESTABLE".equals(carrera.getNombreEstado()));
     }
 
     RegistroParticipacion buscarCaballo(Carrera carrera, int numeroCaballo) throws ApuestaException {

@@ -8,16 +8,17 @@ public class Estable implements EstadoCarrera {
 
     @Override
     public void finalizar(Carrera carrera, RegistroParticipacion caballo) {
-        throw new IllegalStateException("Debe cerrar la carrera antes de finalizarla");
+        throw new IllegalStateException("No se puede finalizar esta carrera");
     }
 
     @Override
     public void abrir(Carrera carrera) {
-        throw new IllegalStateException("La carrera ya esta abierta y estable");
+        throw new IllegalStateException("No se puede abrir esta carrera.");
     }
 
     @Override
     public void cerrar(Carrera carrera) {
+        carrera.congelarDividendos();
         carrera.cambiarEstado(new Cerrada());
     }
 

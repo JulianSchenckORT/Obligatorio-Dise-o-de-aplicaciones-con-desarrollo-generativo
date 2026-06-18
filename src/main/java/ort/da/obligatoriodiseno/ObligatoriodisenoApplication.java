@@ -13,9 +13,9 @@ import ort.da.obligatoriodiseno.Dominio.Carrera;
 import ort.da.obligatoriodiseno.Dominio.Jugador;
 import ort.da.obligatoriodiseno.Dominio.RegistroParticipacion;
 import ort.da.obligatoriodiseno.Dominio.estadosCarrera.Abierta;
-import ort.da.obligatoriodiseno.Dominio.estadosCarrera.Cerrada;
-import ort.da.obligatoriodiseno.Dominio.estadosCarrera.Estable;
 import ort.da.obligatoriodiseno.Dominio.formaDeApostar.Simple;
+import ort.da.obligatoriodiseno.Dominio.formaDeApostar.Super;
+import ort.da.obligatoriodiseno.Dominio.formaDeApostar.Triple;
 import ort.da.obligatoriodiseno.servicios.fachada.Fachada;
 
 @SpringBootApplication
@@ -31,6 +31,11 @@ public class ObligatoriodisenoApplication {
         fachada.registrarUsuario(new Admin("a2", "a2", "Segundo Administrador"));
         fachada.registrarUsuario(new Jugador("j1", "j1", "Usuario Jugador", 2000));
         fachada.registrarUsuario(new Jugador("j2", "j2", "Segundo Jugador", 3000));
+
+        Simple modalidadSimple = new Simple();
+        fachada.registrarModalidad(modalidadSimple);
+        fachada.registrarModalidad(new Triple());
+        fachada.registrarModalidad(new Super());
 
         List<Caballo> caballos = List.of(
                 fachada.registrarCaballo("Relampago Celeste"),
@@ -51,19 +56,18 @@ public class ObligatoriodisenoApplication {
 
         Carrera estable = agregarCarrera(fachada, hoy, "Premio Listo para Cerrar", caballos);
         estable.cambiarEstado(new Abierta());
-        precargarApuestas(estable, 4);
-        estable.cambiarEstado(new Estable());
+        precargarApuestas(estable, 4, modalidadSimple);
 
         Carrera cerradaAnterior = agregarCarrera(
                 fachada, fechaAnterior, "Clasico de la Semana Pasada", caballos);
         cerradaAnterior.cambiarEstado(new Abierta());
-        precargarApuestas(cerradaAnterior, 12);
-        cerradaAnterior.cambiarEstado(new Cerrada());
+        precargarApuestas(cerradaAnterior, 12, modalidadSimple);
+        cerradaAnterior.cerrar();
 
         Carrera granPremioAnterior = agregarCarrera(fachada, fechaAnterior, "Gran Premio Anterior", caballos);
         granPremioAnterior.cambiarEstado(new Abierta());
-        precargarApuestas(granPremioAnterior, 12);
-        granPremioAnterior.cambiarEstado(new Cerrada());
+        precargarApuestas(granPremioAnterior, 12, modalidadSimple);
+        granPremioAnterior.cerrar();
 
         agregarCarrera(fachada, fechaFutura, "Premio Futuro", caballos);
     }
@@ -77,13 +81,13 @@ public class ObligatoriodisenoApplication {
         return carrera;
     }
 
-    private static void precargarApuestas(Carrera carrera, int cantidadPorCaballo) {
+    private static void precargarApuestas(Carrera carrera, int cantidadPorCaballo, Simple modalidadSimple) {
         int indice = 1;
         for (RegistroParticipacion caballo : carrera.getCaballos()) {
             for (int i = 0; i < cantidadPorCaballo; i++) {
                 Jugador jugador = new Jugador(
                         "demo" + indice, "demo" + indice, "Jugador Demo " + indice, 50000);
-                Apuesta apuesta = new Apuesta(800 + (i * 50), caballo, jugador, new Simple());
+                Apuesta apuesta = new Apuesta(800 + (i * 50), caballo, jugador, modalidadSimple);
                 jugador.confirmarApuesta(apuesta);
                 indice++;
             }

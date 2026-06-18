@@ -27,8 +27,9 @@ public class PresentadorApuesta {
 
     @GetMapping("/tablero")
     public Commands obtenerTablero(HttpSession sesionHttp) throws ApuestaException {
-        validarAdministrador(sesionHttp);
-        return Command.lista(new Command("mostrarTableroAdministrador", fachada.obtenerTableroAdministrador()));
+        Admin admin = validarAdministrador(sesionHttp);
+        return Command.lista(new Command("mostrarTableroAdministrador",
+                personalizar(fachada.obtenerTableroAdministrador(), admin)));
     }
 
     @GetMapping("/tablero/jornada")
@@ -36,8 +37,9 @@ public class PresentadorApuesta {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
             HttpSession sesionHttp) throws ApuestaException {
 
-        validarAdministrador(sesionHttp);
-        return Command.lista(new Command("mostrarTableroAdministrador", fachada.obtenerTableroAdministrador(fecha)));
+        Admin admin = validarAdministrador(sesionHttp);
+        return Command.lista(new Command("mostrarTableroAdministrador",
+                personalizar(fachada.obtenerTableroAdministrador(fecha), admin)));
     }
 
     @GetMapping("/tablero/jornada/anterior")
@@ -45,8 +47,9 @@ public class PresentadorApuesta {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
             HttpSession sesionHttp) throws ApuestaException {
 
-        validarAdministrador(sesionHttp);
-        return Command.lista(new Command("mostrarTableroAdministrador", fachada.obtenerTableroJornadaAnterior(fecha)));
+        Admin admin = validarAdministrador(sesionHttp);
+        return Command.lista(new Command("mostrarTableroAdministrador",
+                personalizar(fachada.obtenerTableroJornadaAnterior(fecha), admin)));
     }
 
     @GetMapping("/tablero/jornada/siguiente")
@@ -54,8 +57,9 @@ public class PresentadorApuesta {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
             HttpSession sesionHttp) throws ApuestaException {
 
-        validarAdministrador(sesionHttp);
-        return Command.lista(new Command("mostrarTableroAdministrador", fachada.obtenerTableroJornadaSiguiente(fecha)));
+        Admin admin = validarAdministrador(sesionHttp);
+        return Command.lista(new Command("mostrarTableroAdministrador",
+                personalizar(fachada.obtenerTableroJornadaSiguiente(fecha), admin)));
     }
 
     @PostMapping("/carreras/{numero}/gestionar")
@@ -75,9 +79,9 @@ public class PresentadorApuesta {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
             HttpSession sesionHttp) throws ApuestaException {
 
-        validarAdministrador(sesionHttp);
+        Admin admin = validarAdministrador(sesionHttp);
         CarreraDto carrera = fachada.abrirCarrera(fecha, numero);
-        TableroAdministradorDto tablero = fachada.obtenerTableroAdministrador(fecha);
+        TableroAdministradorDto tablero = personalizar(fachada.obtenerTableroAdministrador(fecha), admin);
         return Command.lista(
                 new Command("gestionarCarrera", carrera),
                 new Command("mostrarTableroAdministrador", tablero),
@@ -90,9 +94,9 @@ public class PresentadorApuesta {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
             HttpSession sesionHttp) throws ApuestaException {
 
-        validarAdministrador(sesionHttp);
+        Admin admin = validarAdministrador(sesionHttp);
         CarreraDto carrera = fachada.cerrarCarrera(fecha, numero);
-        TableroAdministradorDto tablero = fachada.obtenerTableroAdministrador(fecha);
+        TableroAdministradorDto tablero = personalizar(fachada.obtenerTableroAdministrador(fecha), admin);
         return Command.lista(
                 new Command("gestionarCarrera", carrera),
                 new Command("mostrarTableroAdministrador", tablero),
@@ -106,9 +110,9 @@ public class PresentadorApuesta {
             @RequestParam(required = false) Integer caballoGanador,
             HttpSession sesionHttp) throws ApuestaException {
 
-        validarAdministrador(sesionHttp);
+        Admin admin = validarAdministrador(sesionHttp);
         CarreraDto carrera = fachada.finalizarCarrera(fecha, numero, caballoGanador);
-        TableroAdministradorDto tablero = fachada.obtenerTableroAdministrador(fecha);
+        TableroAdministradorDto tablero = personalizar(fachada.obtenerTableroAdministrador(fecha), admin);
         return Command.lista(
                 new Command("gestionarCarrera", carrera),
                 new Command("mostrarTableroAdministrador", tablero),
@@ -121,5 +125,10 @@ public class PresentadorApuesta {
             return admin;
         }
         throw new ApuestaException("Debe iniciar sesion como administrador");
+    }
+
+    private TableroAdministradorDto personalizar(TableroAdministradorDto tablero, Admin admin) {
+        tablero.setNombreAdministrador(admin.getNombre());
+        return tablero;
     }
 }

@@ -8,17 +8,17 @@ public class Finalizada implements EstadoCarrera {
 
     @Override
     public void finalizar(Carrera carrera, RegistroParticipacion caballo) {
-        throw new IllegalStateException("La carrera ya esta finalizada");
+        throw new IllegalStateException("No se puede finalizar esta carrera");
     }
 
     @Override
     public void abrir(Carrera carrera) {
-        throw new IllegalStateException("No se puede abrir una carrera finalizada");
+        throw new IllegalStateException("No se puede abrir esta carrera.");
     }
 
     @Override
     public void cerrar(Carrera carrera) {
-        throw new IllegalStateException("No se puede cerrar una carrera finalizada");
+        throw new IllegalStateException("No es posible cerrar esta carrera");
     }
 
     @Override

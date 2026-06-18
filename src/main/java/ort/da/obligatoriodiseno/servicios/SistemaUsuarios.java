@@ -19,12 +19,15 @@ public class SistemaUsuarios {
     private final Collection<SesionActiva> sesiones;
     private final SistemaCarrera sistemaCarrera;
     private final SistemaApuestas sistemaApuestas;
+    private final SistemaModalidadesApuesta sistemaModalidades;
 
-    public SistemaUsuarios(SistemaCarrera sistemaCarrera, SistemaApuestas sistemaApuestas) {
+    public SistemaUsuarios(SistemaCarrera sistemaCarrera, SistemaApuestas sistemaApuestas,
+            SistemaModalidadesApuesta sistemaModalidades) {
         this.usuarios = new ArrayList<>();
         this.sesiones = new ArrayList<>();
         this.sistemaCarrera = sistemaCarrera;
         this.sistemaApuestas = sistemaApuestas;
+        this.sistemaModalidades = sistemaModalidades;
     }
 
     public void registrarUsuario(Usuario usuario) {
@@ -50,6 +53,7 @@ public class SistemaUsuarios {
         tablero.setSaldoActual(jugador.getSaldo());
         tablero.setTotalApostado(jugador.calcularTotalApostado());
         tablero.setTotalGanado(jugador.getGanancias());
+        tablero.setModalidadesApuesta(sistemaModalidades.obtenerNombres());
 
         for (Carrera carrera : sistemaCarrera.getCarrerasDisponibles()) {
             tablero.getCarrerasDisponibles().add(sistemaCarrera.crearCarreraDto(carrera));
@@ -62,20 +66,20 @@ public class SistemaUsuarios {
 
     private Usuario login(String nombre, String contrasenia) throws ApuestaException {
         if (nombre == null || nombre.isBlank() || contrasenia == null || contrasenia.isBlank()) {
-            throw new ApuestaException("Debe ingresar usuario y contrasena");
+            throw new ApuestaException("Acceso denegado");
         }
         for (Usuario usuario : usuarios) {
             if (usuario.esPasswordDe(nombre, contrasenia)) {
                 return usuario;
             }
         }
-        throw new ApuestaException("Usuario o contrasena incorrectos");
+        throw new ApuestaException("Acceso denegado");
     }
 
     public Admin loginAdministrador(String nombre, String contrasenia) throws ApuestaException {
         Usuario usuario = login(nombre, contrasenia);
         if (!(usuario instanceof Admin admin)) {
-            throw new ApuestaException("El usuario ingresado no es administrador");
+            throw new ApuestaException("Acceso denegado");
         }
         if (tieneSesionActiva(admin)) {
             throw new ApuestaException("El administrador ya tiene una sesion activa");
@@ -87,7 +91,7 @@ public class SistemaUsuarios {
     public Jugador loginJugador(String nombre, String contrasenia) throws ApuestaException {
         Usuario usuario = login(nombre, contrasenia);
         if (!(usuario instanceof Jugador jugador)) {
-            throw new ApuestaException("El usuario ingresado no es jugador");
+            throw new ApuestaException("Acceso denegado");
         }
         if (!tieneSesionActiva(jugador)) {
             sesiones.add(new SesionActiva(jugador));
@@ -106,10 +110,6 @@ public class SistemaUsuarios {
 
     public void logout(Usuario usuario) {
         sesiones.removeIf(sesion -> sesion.getUsuario().equals(usuario));
-    }
-
-    public void cerrarSesionesAdministradores() {
-        sesiones.removeIf(SesionActiva::esAdministrador);
     }
 
     public Collection<SesionActiva> getSesiones() {

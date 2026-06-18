@@ -17,7 +17,7 @@ public class Confirmada implements EstadoApuesta {
     }
 
     @Override
-    public void Pagar(double ganancias, Jugador jugador) {
-        jugador.setGanancias(jugador.getGanancias() + ganancias);
+    public void pagar(double ganancias, Jugador jugador) {
+        jugador.acreditarGanancia(ganancias);
     }
 }
