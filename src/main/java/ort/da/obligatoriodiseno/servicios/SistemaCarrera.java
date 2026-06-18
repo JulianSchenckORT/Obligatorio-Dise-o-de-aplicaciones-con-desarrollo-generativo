@@ -128,7 +128,7 @@ public class SistemaCarrera {
         throw new ApuestaException("No existe el caballo seleccionado para esa carrera");
     }
 
-    Carrera obtenerCarreraPorRegistro(RegistroParticipacion registro) {
+    Carrera obtenerCarreraDe(RegistroParticipacion registro) {
         if (registro == null || registro.getCarrera() == null) {
             throw new ApuestaException("No se encontró la carrera asociada a la apuesta");
         }
