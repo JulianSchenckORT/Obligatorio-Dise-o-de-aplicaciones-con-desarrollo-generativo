@@ -41,18 +41,31 @@ public class ObligatoriodisenoApplication {
                 fachada.registrarCaballo("Relampago Celeste"),
                 fachada.registrarCaballo("Fuerza Nortena"),
                 fachada.registrarCaballo("Sombra de Luna"),
-                fachada.registrarCaballo("El Paisano"));
+                fachada.registrarCaballo("El Paisano"),
+                fachada.registrarCaballo("Viento del Sur"),
+                fachada.registrarCaballo("Estrella Oriental"),
+                fachada.registrarCaballo("Don Coraje"),
+                fachada.registrarCaballo("Luz de Abril"));
 
         LocalDate hoy = LocalDate.now();
         LocalDate fechaAnterior = hoy.minusWeeks(1);
+        LocalDate fechaAnteriorLejana = hoy.minusWeeks(2);
+        LocalDate fechaProxima = hoy.plusDays(3);
         LocalDate fechaFutura = hoy.plusWeeks(1);
-        fachada.registrarJornada(hoy);
-        fachada.registrarJornada(fechaAnterior);
-        fachada.registrarJornada(fechaFutura);
+        LocalDate fechaFuturaLejana = hoy.plusWeeks(2);
 
-        agregarCarrera(fachada, hoy, "Premio Apertura", caballos);
-        agregarCarrera(fachada, hoy, "Clasico MalaPata", caballos);
-        agregarCarrera(fachada, hoy, "Copa Primavera", caballos);
+        fachada.registrarJornada(fechaAnteriorLejana);
+        fachada.registrarJornada(fechaAnterior);
+        fachada.registrarJornada(hoy);
+        fachada.registrarJornada(fechaProxima);
+        fachada.registrarJornada(fechaFutura);
+        fachada.registrarJornada(fechaFuturaLejana);
+
+        agregarCarreraDisponible(fachada, hoy, "Premio Apertura", caballos);
+        agregarCarreraDisponible(fachada, hoy, "Clasico MalaPata", caballos);
+        agregarCarreraDisponible(fachada, hoy, "Copa Primavera", caballos);
+        agregarCarreraDisponible(fachada, hoy, "Gran Premio Montevideo", caballos);
+        agregarCarrera(fachada, hoy, "Desafio del Prado", caballos);
 
         Carrera estable = agregarCarrera(fachada, hoy, "Premio Listo para Cerrar", caballos);
         estable.cambiarEstado(new Abierta());
@@ -69,7 +82,25 @@ public class ObligatoriodisenoApplication {
         precargarApuestas(granPremioAnterior, 12, modalidadSimple);
         granPremioAnterior.cerrar();
 
-        agregarCarrera(fachada, fechaFutura, "Premio Futuro", caballos);
+        Carrera copaHistorica = agregarCarrera(
+                fachada, fechaAnteriorLejana, "Copa Historica", caballos);
+        copaHistorica.cambiarEstado(new Abierta());
+        precargarApuestas(copaHistorica, 6, modalidadSimple);
+        copaHistorica.cerrar();
+
+        agregarCarreraDisponible(fachada, fechaProxima, "Premio Reencuentro", caballos);
+        agregarCarreraDisponible(fachada, fechaProxima, "Copa Rio de la Plata", caballos);
+        agregarCarreraDisponible(fachada, fechaProxima, "Clasico Centenario", caballos);
+        agregarCarreraDisponible(fachada, fechaProxima, "Premio Velocidad", caballos);
+
+        agregarCarreraDisponible(fachada, fechaFutura, "Premio Futuro", caballos);
+        agregarCarreraDisponible(fachada, fechaFutura, "Gran Clasico Nacional", caballos);
+        agregarCarreraDisponible(fachada, fechaFutura, "Copa del Este", caballos);
+        agregarCarreraDisponible(fachada, fechaFutura, "Premio Los Aromos", caballos);
+
+        agregarCarreraDisponible(fachada, fechaFuturaLejana, "Premio Horizonte", caballos);
+        agregarCarreraDisponible(fachada, fechaFuturaLejana, "Clasico del Sur", caballos);
+        agregarCarreraDisponible(fachada, fechaFuturaLejana, "Copa Generacion", caballos);
     }
 
     private static Carrera agregarCarrera(
@@ -78,6 +109,13 @@ public class ObligatoriodisenoApplication {
         for (Caballo caballo : caballos) {
             fachada.agregarParticipante(caballo, carrera);
         }
+        return carrera;
+    }
+
+    private static Carrera agregarCarreraDisponible(
+            Fachada fachada, LocalDate fecha, String nombre, List<Caballo> caballos) {
+        Carrera carrera = agregarCarrera(fachada, fecha, nombre, caballos);
+        carrera.cambiarEstado(new Abierta());
         return carrera;
     }
 
