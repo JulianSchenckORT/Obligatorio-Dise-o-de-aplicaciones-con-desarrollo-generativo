@@ -68,11 +68,11 @@ public class SistemaCarrera {
     }
 
     public CarreraDto obtenerCarreraParaGestion(LocalDate fecha, int numero) {
-        return crearCarreraDto(obtenerCarreraDominio(fecha, numero));
+        return crearCarreraDto(obtenerCarreraRequerida(fecha, numero));
     }
 
     public CarreraDto abrirCarrera(LocalDate fecha, int numero) {
-        Carrera carrera = obtenerCarreraDominio(fecha, numero);
+        Carrera carrera = obtenerCarreraRequerida(fecha, numero);
         try {
             carrera.abrir();
         } catch (IllegalStateException e) {
@@ -83,7 +83,7 @@ public class SistemaCarrera {
     }
 
     public CarreraDto cerrarCarrera(LocalDate fecha, int numero) {
-        Carrera carrera = obtenerCarreraDominio(fecha, numero);
+        Carrera carrera = obtenerCarreraRequerida(fecha, numero);
         try {
             carrera.cerrar();
         } catch (IllegalStateException e) {
@@ -97,7 +97,7 @@ public class SistemaCarrera {
         if (caballoGanador == null) {
             throw new CarreraException("Debe indicar el caballo ganador de la carrera");
         }
-        Carrera carrera = obtenerCarreraDominio(fecha, numero);
+        Carrera carrera = obtenerCarreraRequerida(fecha, numero);
         RegistroParticipacion ganador = buscarCaballo(carrera, caballoGanador);
         try {
             carrera.finalizar(ganador);
@@ -130,7 +130,7 @@ public class SistemaCarrera {
         throw new CaballoException("No existe el caballo seleccionado para esa carrera");
     }
 
-    Carrera obtenerCarreraPorRegistro(RegistroParticipacion registro) {
+    Carrera obtenerCarreraDe(RegistroParticipacion registro) {
         if (registro == null || registro.getCarrera() == null) {
             throw new CarreraException("No se encontró la carrera asociada a la apuesta");
         }
@@ -153,7 +153,7 @@ public class SistemaCarrera {
         return caballos;
     }
 
-    private Carrera obtenerCarreraDominio(LocalDate fecha, int numero) {
+    private Carrera obtenerCarreraRequerida(LocalDate fecha, int numero) {
         Carrera carrera = getCarrera(fecha, numero);
         if (carrera == null) {
             throw new CarreraException("No existe la carrera seleccionada");

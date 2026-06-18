@@ -23,7 +23,7 @@ public class Cerrada implements EstadoCarrera {
 
     @Override
     public void cerrar(Carrera carrera) {
-        throw new IllegalStateException("No es posible cerrar esta carrera");
+        throw new IllegalStateException("La carrera ya esta cerrada");
     }
 
     @Override

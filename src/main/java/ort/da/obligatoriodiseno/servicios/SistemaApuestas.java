@@ -61,7 +61,7 @@ public class SistemaApuestas {
 
     public ApuestaEnCursoDto obtenerApuestaEnCurso(Apuesta apuesta) {
         RegistroParticipacion caballo = apuesta.getNroRegistroCaballo();
-        Carrera carrera = sistemaCarrera.obtenerCarreraPorRegistro(caballo);
+        Carrera carrera = sistemaCarrera.obtenerCarreraDe(caballo);
         double dividendo = caballo.getDividendo();
         double totalApostadoCaballo = caballo.getTotalApostado() + apuesta.getMonto();
         double montoPotencial = dividendo > 1
@@ -76,7 +76,7 @@ public class SistemaApuestas {
     public void confirmarApuesta(Jugador jugador, Apuesta apuesta, String contrasenia) {
         validarContrasenia(jugador, contrasenia);
         validarMonto(apuesta.getMonto());
-        Carrera carrera = sistemaCarrera.obtenerCarreraPorRegistro(apuesta.getNroRegistroCaballo());
+        Carrera carrera = sistemaCarrera.obtenerCarreraDe(apuesta.getNroRegistroCaballo());
 
         synchronized (carrera) {
             if (!sistemaCarrera.estaDisponibleParaApostar(carrera)) {
@@ -106,9 +106,9 @@ public class SistemaApuestas {
     public List<Apuesta> obtenerApuestasOrdenadas(Jugador jugador) {
         List<Apuesta> ordenadas = new ArrayList<>(jugador.getHistorialApuestas());
         Comparator<Apuesta> porFecha = Comparator.comparing(apuesta -> sistemaCarrera
-                .obtenerCarreraPorRegistro(apuesta.getNroRegistroCaballo()).getJornada().getFecha());
+                .obtenerCarreraDe(apuesta.getNroRegistroCaballo()).getJornada().getFecha());
         Comparator<Apuesta> porCarrera = Comparator.comparingInt(apuesta -> sistemaCarrera
-                .obtenerCarreraPorRegistro(apuesta.getNroRegistroCaballo()).getNumero());
+                .obtenerCarreraDe(apuesta.getNroRegistroCaballo()).getNumero());
         Comparator<Apuesta> porCaballo = Comparator.comparingInt(apuesta -> apuesta.getNroRegistroCaballo().getId());
         ordenadas.sort(porFecha.reversed().thenComparing(porCarrera.reversed()).thenComparing(porCaballo.reversed()));
         return ordenadas;
@@ -116,7 +116,7 @@ public class SistemaApuestas {
 
     ApuestaJugadorDto crearApuestaJugadorDto(Apuesta apuesta) {
         RegistroParticipacion caballo = apuesta.getNroRegistroCaballo();
-        Carrera carrera = sistemaCarrera.obtenerCarreraPorRegistro(caballo);
+        Carrera carrera = sistemaCarrera.obtenerCarreraDe(caballo);
         boolean finalizada = carrera.estaFinalizada();
         double dividendoFinal = finalizada ? caballo.getDividendoFinal() : 0;
 
